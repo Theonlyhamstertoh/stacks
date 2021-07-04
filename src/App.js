@@ -4,9 +4,33 @@ import { useTexture, OrbitControls, Html, OrthographicCamera, useHelper } from "
 import { useRef, useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+const INITIAL_BLOCK = {
+  position: { x: 0, y: 0, z: 0 },
+  size: [3, 1, 3],
+  color: `hsl(${180 + 1 * 2},  100%, 60%)`,
+  direction: undefined,
+  key: uuidv4(),
+  move: false,
+};
 const CreateBlock = ({ position, color, direction, move, size }) => {
+  if (direction !== undefined) {
+    position[direction] = -10;
+  }
+
+  const mesh = useRef();
+
+  const { clock } = useThree();
+  clock.start();
+  useFrame(({ clock }) => {
+    if (mesh.current.position[direction] < 0) {
+      mesh.current.position[direction] = clock.getElapsedTime() - 10;
+    } else if (mesh.current.position[direction] > 0) {
+      clock.stop();
+    }
+  });
+
   return (
-    <mesh position={position}>
+    <mesh ref={mesh} position={[position.x, position.y, position.z]}>
       <boxBufferGeometry args={size} />
       <meshLambertMaterial color={color} />
     </mesh>
@@ -14,7 +38,7 @@ const CreateBlock = ({ position, color, direction, move, size }) => {
 };
 
 export default function App() {
-  const [stacks, setStacks] = useState([]);
+  const [stacks, setStacks] = useState([INITIAL_BLOCK]);
 
   const handleKey = (e) => {
     switch (e.code) {
@@ -30,7 +54,7 @@ export default function App() {
   const moveCameraUp = ({ position }) => {};
   const createNewLayer = () => {
     const color = `hsl(${180 + stacks.length * 2},  100%, 60%)`;
-    const position = [0, stacks.length, 0];
+    const position = { x: 0, y: stacks.length, z: 0 };
     const direction = stacks.length % 2 ? "x" : "z";
     const size = [3, 1, 3];
     const newBlock = {
@@ -65,18 +89,15 @@ export default function App() {
 const Camera = ({ stacks }) => {
   const ref = useRef();
   const { camera } = useThree();
-  const speed = 0.15;
+  const speed = 0.1;
   useFrame(({ camera, clock }) => {
-    console.log(stacks.length, camera.position.y - 120);
-    if (stacks.length > camera.position.y - 120) {
+    if (stacks.length - 1 > camera.position.y - 120) {
       camera.position.y += speed;
     }
-    // console.log(stacks.length - 1, camera.position.y - 50);
   });
 
   camera.lookAt(new THREE.Vector3(0, stacks.length, 0));
   camera.updateProjectionMatrix();
-  // useHelper(ref, THREE.CameraHelper, 1, "hotpink");
 
-  return <OrthographicCamera ref={ref} makeDefault position={[100, 120, 100]} zoom={75} />;
+  return <OrthographicCamera ref={ref} makeDefault position={[100, 120, 100]} zoom={40} />;
 };
