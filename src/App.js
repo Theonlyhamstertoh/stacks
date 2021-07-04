@@ -9,24 +9,25 @@ export default function App() {
   const handleKey = (e) => {
     switch (e.code) {
       case "Space":
-        setStacks();
+        createNewLayer();
     }
   };
 
   const handleClick = (e) => {
-    console.log(e);
+    createNewLayer();
   };
 
-  const createNewLayer = (props) => {
-    const color = `hsl(${180 + 1 * 4},  100%, 60%)`;
-    const position = [0, 1, 0];
+  const createNewLayer = () => {
+    const color = `hsl(${180 + stacks.length * 2},  100%, 60%)`;
+    const position = [0, stacks.length, 0];
     const direction = stacks.length % 2 ? "x" : "z";
-
+    const size = [3, 1, 3];
     const newBlock = {
       position,
       color,
       key: uuidv4(),
       direction,
+      size,
       move: true,
     };
     setStacks((prev) => [...prev, newBlock]);
@@ -43,7 +44,7 @@ export default function App() {
   };
 
   return (
-    <div className="fullScreen" onClick={handleClick} onKeyDown={handleKey}>
+    <div className="fullScreen" onClick={handleClick} onKeyDown={handleKey} tabIndex={-1}>
       <Canvas orthographic camera={{ zoom: 100, position: [100, 50, 100] }}>
         <OrbitControls enablePan={false} rotateSpeed={1} />
         <color attach="background" args={["#222"]} />
@@ -51,9 +52,19 @@ export default function App() {
         <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
 
         {/* Block */}
-        {stacks.map()}
-        <CreateNewBlock onClick={(self) => console.log(self)} />
+        {stacks.map((blockInfo) => {
+          return <CreateBlock {...blockInfo} />;
+        })}
       </Canvas>
     </div>
   );
 }
+
+const CreateBlock = ({ position, color, direction, move, size }) => {
+  return (
+    <mesh position={position}>
+      <boxBufferGeometry args={size} />
+      <meshLambertMaterial color={color} />
+    </mesh>
+  );
+};
