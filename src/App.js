@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useTexture, OrbitControls, Html, OrthographicCamera, useHelper } from "@react-three/drei";
 import { useRef, useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useControls } from "leva";
 
 const INITIAL_BLOCK = {
   position: { x: 0, y: 0, z: 0 },
@@ -12,19 +13,24 @@ const INITIAL_BLOCK = {
   key: uuidv4(),
   move: false,
 };
-const CreateBlock = ({ position, color, direction, move, size }) => {
+const CreateBlock = ({ position, color, speed, direction, move, size, setGameMode }) => {
+  const mesh = useRef();
+  const { clock } = useThree();
+
+  const offset = 10;
   if (direction !== undefined) {
-    position[direction] = -10;
+    position[direction] = -offset;
   }
 
-  const mesh = useRef();
-
-  const { clock } = useThree();
   clock.start();
+  let oldTime = 0;
   useFrame(({ clock }) => {
-    if (mesh.current.position[direction] < 0 && move === true) {
-      mesh.current.position[direction] = clock.getElapsedTime() - 10;
-    } else if (mesh.current.position[direction] > 0) {
+    if (move === true && mesh.current.position[direction] < 0) {
+      const dt = clock.getElapsedTime() - oldTime;
+      mesh.current.position[direction] += dt * speed;
+      oldTime = clock.getElapsedTime();
+    } else if (mesh.current.position[direction] > offset) {
+      setGameMode("gameOver");
     }
   });
 
@@ -38,7 +44,20 @@ const CreateBlock = ({ position, color, direction, move, size }) => {
 
 export default function App() {
   const [stacks, setStacks] = useState([INITIAL_BLOCK]);
+  const [gameMode, setGameMode] = useState("gameNotStarted");
 
+  useEffect(() => {
+    console.log(gameMode);
+  }, [gameMode]);
+
+  const { speed } = useControls({
+    speed: {
+      value: 2,
+      min: 1,
+      max: 20,
+      step: 1,
+    },
+  });
   const handleKey = (e) => {
     switch (e.code) {
       case "Space":
@@ -81,7 +100,14 @@ export default function App() {
         {/* Block */}
         {stacks.map((blockInfo) => {
           moveCameraUp(blockInfo.position);
-          return <CreateBlock {...blockInfo} key={blockInfo.key} />;
+          return (
+            <CreateBlock
+              {...blockInfo}
+              key={blockInfo.key}
+              setGameMode={setGameMode}
+              speed={speed}
+            />
+          );
         })}
       </Canvas>
     </div>
