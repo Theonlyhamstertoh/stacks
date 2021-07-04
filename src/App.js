@@ -22,17 +22,16 @@ const CreateBlock = ({ position, color, direction, move, size }) => {
   const { clock } = useThree();
   clock.start();
   useFrame(({ clock }) => {
-    if (mesh.current.position[direction] < 0) {
+    if (mesh.current.position[direction] < 0 && move === true) {
       mesh.current.position[direction] = clock.getElapsedTime() - 10;
     } else if (mesh.current.position[direction] > 0) {
-      clock.stop();
     }
   });
 
   return (
     <mesh ref={mesh} position={[position.x, position.y, position.z]}>
       <boxBufferGeometry args={size} />
-      <meshLambertMaterial color={color} />
+      <meshNormalMaterial color={color} />
     </mesh>
   );
 };
@@ -52,6 +51,7 @@ export default function App() {
   };
 
   const moveCameraUp = ({ position }) => {};
+
   const createNewLayer = () => {
     const color = `hsl(${180 + stacks.length * 2},  100%, 60%)`;
     const position = { x: 0, y: stacks.length, z: 0 };
@@ -65,7 +65,9 @@ export default function App() {
       size,
       move: true,
     };
-    setStacks((prev) => [...prev, newBlock]);
+    const newStacksArray = stacks.map((block) => ({ ...block, move: false }));
+    newStacksArray.push(newBlock);
+    setStacks(newStacksArray);
   };
 
   return (
