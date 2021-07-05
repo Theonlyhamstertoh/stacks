@@ -1,9 +1,12 @@
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useTexture, OrbitControls, Html, OrthographicCamera, useHelper } from "@react-three/drei";
+import { Physics, useBox, usePlane } from "@react-three/cannon";
 import { useRef, useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
+
 import { useControls } from "leva";
+import { MaskPass } from "three-stdlib";
 
 const INITIAL_BLOCK = {
   position: { x: 0, y: 0, z: 0 },
@@ -12,8 +15,9 @@ const INITIAL_BLOCK = {
   direction: undefined,
   key: uuidv4(),
   move: false,
+  mass: 0,
 };
-const CreateBlock = ({ position, color, speed, direction, move, size, setGameMode }) => {
+const CreateBlock = ({ position, color, speed, direction, move, size, setGameMode, mass }) => {
   const mesh = useRef();
   const { clock } = useThree();
 
@@ -22,20 +26,30 @@ const CreateBlock = ({ position, color, speed, direction, move, size, setGameMod
     position[direction] = -offset;
   }
 
+  /**
+   * Physics
+   */
+  const [ref, api] = useBox(() => ({
+    mass,
+    position: [position.x, position.y, position.z],
+    args: size,
+  }));
+
   clock.start();
   let oldTime = 0;
+  console.log(api);
   useFrame(({ clock }) => {
-    if (move === true && mesh.current.position[direction] < 0) {
+    if (move === true) {
       const dt = clock.getElapsedTime() - oldTime;
-      mesh.current.position[direction] += dt * speed;
+      position[direction] += dt * speed;
+      api.position.set(position.x, position.y, position.z);
+
       oldTime = clock.getElapsedTime();
-    } else if (mesh.current.position[direction] > offset) {
-      setGameMode("gameOver");
     }
   });
 
   return (
-    <mesh ref={mesh} position={[position.x, position.y, position.z]}>
+    <mesh ref={ref}>
       <boxBufferGeometry args={size} />
       <meshNormalMaterial color={color} />
     </mesh>
@@ -45,10 +59,6 @@ const CreateBlock = ({ position, color, speed, direction, move, size, setGameMod
 export default function App() {
   const [stacks, setStacks] = useState([INITIAL_BLOCK]);
   const [gameMode, setGameMode] = useState("gameNotStarted");
-
-  useEffect(() => {
-    console.log(gameMode);
-  }, [gameMode]);
 
   const { speed } = useControls({
     speed: {
@@ -65,25 +75,26 @@ export default function App() {
     }
   };
 
-  const handleClick = (e) => {
-    createNewLayer();
-  };
-
-  const moveCameraUp = ({ position }) => {};
+  const handleClick = (e) => createNewLayer();
 
   const createNewLayer = () => {
     const color = `hsl(${180 + stacks.length * 2},  100%, 60%)`;
     const position = { x: 0, y: stacks.length, z: 0 };
     const direction = stacks.length % 2 ? "x" : "z";
     const size = [3, 1, 3];
+
+    // create new block
     const newBlock = {
       position,
       color,
       key: uuidv4(),
       direction,
       size,
+      mass: 0,
       move: true,
     };
+
+    // set all previous blocks  movement to false. Add new block.
     const newStacksArray = stacks.map((block) => ({ ...block, move: false }));
     newStacksArray.push(newBlock);
     setStacks(newStacksArray);
@@ -96,23 +107,35 @@ export default function App() {
         <color attach="background" args={["#222"]} />
         <ambientLight args={[0xffffff, 0.4]} />
         <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
-
+        {/* <OrbitControls /> */}
         {/* Block */}
-        {stacks.map((blockInfo) => {
-          moveCameraUp(blockInfo.position);
-          return (
-            <CreateBlock
-              {...blockInfo}
-              key={blockInfo.key}
-              setGameMode={setGameMode}
-              speed={speed}
-            />
-          );
-        })}
+        <Physics>
+          {stacks.map((blockInfo) => {
+            return (
+              <CreateBlock
+                {...blockInfo}
+                key={blockInfo.key}
+                setGameMode={setGameMode}
+                speed={speed}
+              />
+            );
+          })}
+          <Plane />
+        </Physics>
       </Canvas>
     </div>
   );
 }
+
+const Plane = () => {
+  const [ref] = usePlane(() => ({ mass: 0, rotation: [-Math.PI / 2, 0, 0] }));
+  return (
+    <mesh ref={ref}>
+      <planeBufferGeometry args={[100, 100]} />
+      <meshPhongMaterial color="hotpink" />
+    </mesh>
+  );
+};
 
 const Camera = ({ stacks }) => {
   const ref = useRef();
