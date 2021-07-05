@@ -15,7 +15,8 @@
     "react-scripts": "4.0.3",
     "three": "^0.129.0",
     "uuid": "^8.3.2",
-    "web-vitals": "^1.0.1"
+    "web-vitals": "^1.0.1",
+    "zustand": "^3.5.5"
   },
   "scripts": {
     "start": "react-scripts start",
