@@ -29,6 +29,7 @@ const useStackStore = create((set) => ({
       return { stacks: [...newStacksArray, newLayer] };
     });
   },
+  resetBlocks: () => set((state) => ({ stacks: INITIAL_BLOCK })),
 }));
 
 export default useStackStore;
