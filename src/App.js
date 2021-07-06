@@ -2,34 +2,41 @@ import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Physics, useBox, usePlane } from "@react-three/cannon";
-import { useRef, useState, useEffect } from "react";
 import Camera from "./Components/Camera";
 import { useControls } from "leva";
-import { CreateBlock } from "./Components/CreateBlock";
+import { Block } from "./Components/CreateBlock";
 import useStackStore from "./Components/hooks/useStore";
 import shallow from "zustand/shallow";
+import playNextLayer from "./Components/playNextLayer";
 
 export default function App() {
-  const addBlock = useStackStore((state) => state.addBlock);
-  const [move, setMove] = useStackStore((state) => [state.move, state.setMove], shallow);
-  // const topLayer = useStackStore((state) => state.topLayer);
-  // const prevLayer = useStackStore((state) => state.prevLayer);
-  const stopBlocksAnimation = useStackStore((state) => state.stopBlocksAnimation);
-  // console.log(stopBlockAnimation);
+  const [move, setMove, addBlock, resetBlocks, topLayer, prevLayer, stacks] = useStackStore(
+    (state) => [
+      state.move,
+      state.setMove,
+      state.addBlock,
+      state.resetBlocks,
+      state.topLayer,
+      state.prevLayer,
+      state.stacks,
+    ],
+    shallow
+  );
+
   const handleKey = (e) => {
     e.code === "Space" && setMove(false);
-    e.code === "Space" && addBlock();
+    e.code === "Space" && playNextLayer(topLayer, prevLayer, stacks, resetBlocks, addBlock);
     e.code === "Space" && setMove(true);
   };
   const handleClick = (e) => {
     setMove(false);
-    addBlock();
+    playNextLayer(topLayer, prevLayer, stacks, resetBlocks, addBlock);
     setMove(true);
   };
 
   return (
     <div className="fullScreen" onClick={handleClick} onKeyDown={handleKey} tabIndex={-1}>
-      <Canvas>
+      <Canvas gl={{ antialias: true }} dpr={Math.max(window.devicePixelRatio, 2)}>
         <Camera />
         <color attach="background" args={["#222"]} />
         <ambientLight args={[0xffffff, 0.4]} />
@@ -70,7 +77,7 @@ const Blocks = ({ move }) => {
     }
   });
   return stacks.map((blockInfo) => {
-    return <CreateBlock {...blockInfo} key={blockInfo.key} speed={speed} />;
+    return <Block {...blockInfo} key={blockInfo.key} />;
   });
 };
 const Plane = () => {
