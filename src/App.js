@@ -9,43 +9,54 @@ import { CreateBlock } from "./Components/CreateBlock";
 import useStackStore from "./Components/hooks/useStore";
 
 export default function App() {
-  const [gameMode, setGameMode] = useState("gameNotStarted");
   const addBlock = useStackStore((state) => state.addBlock);
-  const stacks = useStackStore((state) => state.stacks);
-  const { speed } = useControls({
-    speed: {
-      value: 2,
-      min: 1,
-      max: 20,
-      step: 1,
-    },
-  });
+  const topLayer = useStackStore((state) => state.topLayer);
+  const prevLayer = useStackStore((state) => state.prevLayer);
+  const handleKey = (e) => {
+    e.code === "Space" && addBlock();
+    e.code === "Space" && calculateBlockDistance();
+  };
+  // const handleClick = (e) => {
+  //   addBlock();
+  //   calculateBlockDistance();
+  // };
 
-  const handleKey = (e) => e.code === "Space" && addBlock();
-  const handleClick = (e) => addBlock();
+  const calculateBlockDistance = () => {
+    if (topLayer.direction === undefined) return;
+    const topMeshPosition = topLayer && topLayer.mesh.position;
+    const prevMeshPosition = prevLayer && prevLayer.mesh.position;
+
+    const direction = topLayer.direction;
+    const size = topLayer.direction === "x" ? topLayer.size.x : topLayer.size.z;
+    const delta = topMeshPosition[direction] - prevMeshPosition[direction];
+    const offset = Math.abs(delta);
+
+    const overlap = size - offset;
+
+    console.log(delta);
+    if (overlap > 0) {
+      // ========================== Touching ==============================
+      topLayer.mesh.scale[direction] = overlap / size;
+      topLayer.mesh.position[direction] -= delta / 2;
+    } else if (overlap < 0) {
+      console.log("not touching");
+    }
+    // console.log("new", topMeshPosition  );
+    // console.log("old", prevMeshPosition);
+    // console.log(offset);
+    // console.log("=======end===========");
+  };
 
   return (
-    <div className="fullScreen" onClick={handleClick} onKeyDown={handleKey} tabIndex={-1}>
+    <div className="fullScreen" onKeyDown={handleKey} tabIndex={-1}>
       <Canvas>
-        <Camera stacks={stacks} />
+        <Camera />
         <color attach="background" args={["#222"]} />
         <ambientLight args={[0xffffff, 0.4]} />
         <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
         <OrbitControls />
-        {/* Block */}
         <Physics>
-          {stacks.map((blockInfo) => {
-            console.log(blockInfo.position);
-            return (
-              <CreateBlock
-                {...blockInfo}
-                key={blockInfo.key}
-                setGameMode={setGameMode}
-                speed={speed}
-                blockPosition={blockInfo.position}
-              />
-            );
-          })}
+          <Blocks />
           {/* <Plane /> */}
         </Physics>
       </Canvas>
@@ -53,7 +64,29 @@ export default function App() {
   );
 }
 
-const Blocks = () => {};
+const Blocks = () => {
+  const stacks = useStackStore((state) => state.stacks);
+
+  const { speed } = useControls({
+    speed: {
+      value: 1,
+      min: 0,
+      max: 20,
+      step: 0.25,
+    },
+  });
+
+  return stacks.map((blockInfo) => {
+    return (
+      <CreateBlock
+        {...blockInfo}
+        key={blockInfo.key}
+        speed={speed}
+        blockPosition={blockInfo.position}
+      />
+    );
+  });
+};
 const Plane = () => {
   const [ref] = usePlane(() => ({ mass: 0, rotation: [-Math.PI / 2, 0, 0] }));
   return (

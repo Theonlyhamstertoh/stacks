@@ -2,8 +2,11 @@ import { useRef } from "react";
 import { OrthographicCamera } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import useStackStore from "./hooks/useStore";
 
-const Camera = ({ stacks }) => {
+const Camera = () => {
+  const stacks = useStackStore((state) => state.stacks);
+
   const ref = useRef();
   const { camera } = useThree();
   const speed = 0.1;

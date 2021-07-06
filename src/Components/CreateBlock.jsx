@@ -2,12 +2,13 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useRef, useEffect } from "react";
 import useStackStore from "./hooks/useStore";
 import { v4 as uuidv4 } from "uuid";
+import shallow from "zustand/shallow";
 
 export const createBlockData = (stacks) => {
   const color = `hsl(${180 + stacks.length * 2},  100%, 60%)`;
   const position = { x: 0, y: stacks.length, z: 0 };
   const direction = stacks.length % 2 ? "x" : "z";
-  const size = [3, 1, 3];
+  const size = { x: 3, y: 1, z: 3 };
 
   // create new block
   const newBlock = {
@@ -35,16 +36,17 @@ export const CreateBlock = ({
   blockPosition,
 }) => {
   const setBlockToCorrectLayer = useStackStore((state) => state.setBlockToCorrectLayer);
+
   const mesh = useRef();
 
   useEffect(() => {
-    setBlockToCorrectLayer(mesh.current);
+    setBlockToCorrectLayer({ mesh: mesh.current, direction, size });
   }, []);
 
   const { clock } = useThree();
 
   const offset = 10;
-  if (direction !== undefined) {
+  if (direction === "x" || direction === "z") {
     position[direction] = -offset;
   }
 
@@ -63,7 +65,7 @@ export const CreateBlock = ({
 
   return (
     <mesh ref={mesh} position={[position.x, position.y, position.z]}>
-      <boxBufferGeometry args={size} />
+      <boxBufferGeometry args={[size.x, size.y, size.z]} />
       <meshNormalMaterial color={color} />
     </mesh>
   );
