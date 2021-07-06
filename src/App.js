@@ -18,17 +18,17 @@ export default function App() {
   // console.log(stopBlockAnimation);
   const handleKey = (e) => {
     e.code === "Space" && setMove(false);
-    e.code === "Space" && stopBlocksAnimation();
     e.code === "Space" && addBlock();
     e.code === "Space" && setMove(true);
   };
-  // const handleClick = (e) => {
-  //   addBlock();
-  //   calculateBlockDistance();
-  // };
+  const handleClick = (e) => {
+    setMove(false);
+    addBlock();
+    setMove(true);
+  };
 
   return (
-    <div className="fullScreen" onKeyDown={handleKey} tabIndex={-1}>
+    <div className="fullScreen" onClick={handleClick} onKeyDown={handleKey} tabIndex={-1}>
       <Canvas>
         <Camera />
         <color attach="background" args={["#222"]} />
@@ -50,7 +50,7 @@ const Blocks = ({ move }) => {
 
   const { speed } = useControls({
     speed: {
-      value: 1,
+      value: 2,
       min: 0,
       max: 20,
       step: 0.25,

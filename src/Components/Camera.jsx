@@ -19,6 +19,6 @@ const Camera = () => {
   camera.lookAt(new THREE.Vector3(0, stacks.length, 0));
   camera.updateProjectionMatrix();
 
-  return <OrthographicCamera ref={ref} makeDefault position={[100, 120, 100]} zoom={60} />;
+  return <OrthographicCamera ref={ref} makeDefault position={[100, 120, 100]} zoom={40} />;
 };
 export default Camera;
