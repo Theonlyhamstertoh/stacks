@@ -7,45 +7,25 @@ import Camera from "./Components/Camera";
 import { useControls } from "leva";
 import { CreateBlock } from "./Components/CreateBlock";
 import useStackStore from "./Components/hooks/useStore";
+import shallow from "zustand/shallow";
 
 export default function App() {
   const addBlock = useStackStore((state) => state.addBlock);
-  const topLayer = useStackStore((state) => state.topLayer);
-  const prevLayer = useStackStore((state) => state.prevLayer);
+  const [move, setMove] = useStackStore((state) => [state.move, state.setMove], shallow);
+  // const topLayer = useStackStore((state) => state.topLayer);
+  // const prevLayer = useStackStore((state) => state.prevLayer);
+  const stopBlocksAnimation = useStackStore((state) => state.stopBlocksAnimation);
+  // console.log(stopBlockAnimation);
   const handleKey = (e) => {
+    e.code === "Space" && setMove(false);
+    e.code === "Space" && stopBlocksAnimation();
     e.code === "Space" && addBlock();
-    e.code === "Space" && calculateBlockDistance();
+    e.code === "Space" && setMove(true);
   };
   // const handleClick = (e) => {
   //   addBlock();
   //   calculateBlockDistance();
   // };
-
-  const calculateBlockDistance = () => {
-    if (topLayer.direction === undefined) return;
-    const topMeshPosition = topLayer && topLayer.mesh.position;
-    const prevMeshPosition = prevLayer && prevLayer.mesh.position;
-
-    const direction = topLayer.direction;
-    const size = topLayer.direction === "x" ? topLayer.size.x : topLayer.size.z;
-    const delta = topMeshPosition[direction] - prevMeshPosition[direction];
-    const offset = Math.abs(delta);
-
-    const overlap = size - offset;
-
-    console.log(delta);
-    if (overlap > 0) {
-      // ========================== Touching ==============================
-      topLayer.mesh.scale[direction] = overlap / size;
-      topLayer.mesh.position[direction] -= delta / 2;
-    } else if (overlap < 0) {
-      console.log("not touching");
-    }
-    // console.log("new", topMeshPosition  );
-    // console.log("old", prevMeshPosition);
-    // console.log(offset);
-    // console.log("=======end===========");
-  };
 
   return (
     <div className="fullScreen" onKeyDown={handleKey} tabIndex={-1}>
@@ -54,9 +34,9 @@ export default function App() {
         <color attach="background" args={["#222"]} />
         <ambientLight args={[0xffffff, 0.4]} />
         <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
-        <OrbitControls />
+        {/* <OrbitControls /> */}
         <Physics>
-          <Blocks />
+          <Blocks move={move} />
           {/* <Plane /> */}
         </Physics>
       </Canvas>
@@ -64,8 +44,9 @@ export default function App() {
   );
 }
 
-const Blocks = () => {
+const Blocks = ({ move }) => {
   const stacks = useStackStore((state) => state.stacks);
+  const topLayer = useStackStore((state) => state.topLayer);
 
   const { speed } = useControls({
     speed: {
@@ -75,16 +56,21 @@ const Blocks = () => {
       step: 0.25,
     },
   });
+  const { clock } = useThree();
 
+  clock.start();
+  let oldTime = 0;
+  useFrame(({ clock }) => {
+    const direction = topLayer.direction;
+    if (move) {
+      const position = topLayer.mesh.position;
+      const dt = clock.getElapsedTime() - oldTime;
+      position[direction] += dt * speed;
+      oldTime = clock.getElapsedTime();
+    }
+  });
   return stacks.map((blockInfo) => {
-    return (
-      <CreateBlock
-        {...blockInfo}
-        key={blockInfo.key}
-        speed={speed}
-        blockPosition={blockInfo.position}
-      />
-    );
+    return <CreateBlock {...blockInfo} key={blockInfo.key} speed={speed} />;
   });
 };
 const Plane = () => {
