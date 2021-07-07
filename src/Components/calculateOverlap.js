@@ -15,7 +15,7 @@ const calculateOverlapData = (topLayer, prevLayer, size) => {
 
   // calculate the part where there was overlap
   const overlap = size - offset;
-  return [overlap, delta, offset];
+  return [overlap, delta, offset, size];
 };
 
 export default calculateOverlapData;

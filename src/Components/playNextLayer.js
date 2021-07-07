@@ -11,7 +11,16 @@ const playNextLayer = (topLayer, prevLayer, stacks, resetBlocks, addBlock, addOv
   if (overlap > 0 || overlap === null) {
     /* ========================== Touching ============================== */
     stacks.length > 1 &&
-      createOverhangBlock(snapShotPosition, offset, overlap, stacks, topLayer, addOverhangBlock);
+      createOverhangBlock(
+        snapShotPosition,
+        offset,
+        overlap,
+        stacks,
+        topLayer,
+        addOverhangBlock,
+        delta,
+        size
+      );
     repositionBlockInside(topLayer, delta, overlap, size, snapShotPosition);
 
     // overhang block creation
