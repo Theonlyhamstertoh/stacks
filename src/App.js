@@ -4,16 +4,18 @@ import { OrbitControls } from "@react-three/drei";
 import { Physics, useBox, usePlane } from "@react-three/cannon";
 import Camera from "./Components/Camera";
 import { useControls } from "leva";
+import { useState } from "react";
 import { Block } from "./Components/CreateBlock";
 import useStackStore from "./Components/hooks/useStore";
 import shallow from "zustand/shallow";
 import playNextLayer from "./Components/playNextLayer";
 
 export default function App() {
-  const [move, setMove, addBlock, resetBlocks, topLayer, prevLayer, stacks] = useStackStore(
+  const [move, setMove] = useState(false);
+  const [addBlock, resetBlocks, topLayer, prevLayer, stacks] = useStackStore(
     (state) => [
-      state.move,
-      state.setMove,
+      // state.move,
+
       state.addBlock,
       state.resetBlocks,
       state.topLayer,
@@ -30,8 +32,11 @@ export default function App() {
   };
   const handleClick = (e) => {
     setMove(false);
+    // console.log(topLayer.mesh.position[topLayer.direction]);
     playNextLayer(topLayer, prevLayer, stacks, resetBlocks, addBlock);
+    // addBlock();
     setMove(true);
+    console.log("============================");
   };
 
   return (
@@ -43,7 +48,7 @@ export default function App() {
         <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
         {/* <OrbitControls /> */}
         <Physics>
-          <Blocks move={move} />
+          <Blocks stacks={stacks} topLayer={topLayer} move={move} />
           {/* <Plane /> */}
         </Physics>
       </Canvas>
@@ -51,10 +56,7 @@ export default function App() {
   );
 }
 
-const Blocks = ({ move }) => {
-  const stacks = useStackStore((state) => state.stacks);
-  const topLayer = useStackStore((state) => state.topLayer);
-
+const Blocks = ({ stacks, topLayer, move }) => {
   const { speed } = useControls({
     speed: {
       value: 2,
@@ -70,10 +72,14 @@ const Blocks = ({ move }) => {
   useFrame(({ clock }) => {
     const direction = topLayer.direction;
     if (move) {
+      console.log("RUNNING");
       const position = topLayer.mesh.position;
       const dt = clock.getElapsedTime() - oldTime;
       position[direction] += dt * speed;
       oldTime = clock.getElapsedTime();
+    } else {
+      console.log("STOPPPED");
+      clock.stop();
     }
   });
   return stacks.map((blockInfo) => {
@@ -85,7 +91,7 @@ const Plane = () => {
   return (
     <mesh ref={ref}>
       <planeBufferGeometry args={[100, 100]} />
-      <meshPhongMaterial color="hotpink" />
+      <meshLambertMaterial color="#141817" />
     </mesh>
   );
 };

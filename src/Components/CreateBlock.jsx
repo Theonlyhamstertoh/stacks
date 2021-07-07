@@ -2,16 +2,16 @@ import { useRef, useEffect } from "react";
 import useStackStore from "./hooks/useStore";
 import { v4 as uuidv4 } from "uuid";
 
-export const initializeNextBlockData = (topLayer, direction, overlap, size) => {
-  /* ========================== Touching ============================== */
-  if (direction === null && overlap === null && size === null) {
-    console.log(topLayer);
-    return [topLayer.size.x, topLayer.size.z, -10, 0];
-  }
+export const repositionBlockInside = (topLayer, snapShotPosition, overlap, size) => {
+  if (snapShotPosition === NaN) return;
+  topLayer.mesh.scale[topLayer.direction] = overlap / size;
+  topLayer.mesh.position[topLayer.direction] = (snapShotPosition + 0) / 2;
+};
 
-  /* Cut block to be within the prevblock */
-  topLayer.mesh.scale[direction] = overlap / size;
-  topLayer.mesh.position[direction] = (topLayer.mesh.position[direction] + 0) / 2;
+export const initializeNextBlockData = (topLayer, overlap) => {
+  /* ========================== Touching ============================== */
+  if (topLayer.direction) return [topLayer.size.x, topLayer.size.z, -10, 0];
+  const direction = topLayer.direction;
 
   // provide new data
   const newWidth = direction === "x" ? overlap : topLayer.size.x;
@@ -24,7 +24,7 @@ export const initializeNextBlockData = (topLayer, direction, overlap, size) => {
 };
 
 export const createBlockData = (stacks, [newWidth, newDepth, nextX, nextZ]) => {
-  const color = `hsl(${180 + stacks.length * 4}, 100%, 60%)`;
+  const color = `hsl(${140 + stacks.length * 4}, 100%, 60%)`;
   const position = { x: nextX, y: stacks.length, z: nextZ };
   const direction = stacks.length % 2 ? "x" : "z";
   const size = { x: newWidth, y: 1, z: newDepth };
@@ -57,7 +57,7 @@ export const Block = ({ position, color, direction, move, size, mass }) => {
   return (
     <mesh ref={mesh} position={[position.x, position.y, position.z]}>
       <boxBufferGeometry args={[size.x, size.y, size.z]} />
-      <meshLambertMaterial color={color} />
+      <meshNormalMaterial color={color} />
     </mesh>
   );
 };
