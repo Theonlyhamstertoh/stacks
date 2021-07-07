@@ -94,7 +94,7 @@ const useStackStore = create((set) => ({
   prevLayer: "",
   move: false,
   stacks: [INITIAL_BLOCK],
-  overhangs: [],
+  overhangsArray: [],
   setBlockToCorrectLayer: (block) =>
     set((state) => ({
       prevLayer: state.topLayer,
@@ -103,7 +103,8 @@ const useStackStore = create((set) => ({
   addBlock: (nextBlock) => set((state) => ({ stacks: [...state.stacks, nextBlock] })),
   setMove: (boolean) => set((state) => ({ move: boolean })),
   resetBlocks: () => set((state) => ({ stacks: INITIAL_BLOCK })),
-  addOverhangBlock: (newBlock) => set((state) => ({ overhangs: [...state.overhangs, newBlock] })),
+  addOverhangBlock: (newBlock) =>
+    set((state) => ({ overhangsArray: [...state.overhangsArray, newBlock] })),
 }));
 
 export default useStackStore;

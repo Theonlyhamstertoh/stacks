@@ -9,10 +9,11 @@ import { Block } from "./Components/CreateBlock";
 import useStackStore from "./Components/hooks/useStore";
 import shallow from "zustand/shallow";
 import playNextLayer from "./Components/playNextLayer";
+import { Overhang } from "./Components/CreateOverhang";
 
 export default function App() {
   const [move, setMove] = useState(false);
-  const [addBlock, resetBlocks, topLayer, prevLayer, stacks] = useStackStore(
+  const [addBlock, resetBlocks, topLayer, prevLayer, stacks, addOverhangBlock] = useStackStore(
     (state) => [
       // state.move,
 
@@ -21,19 +22,21 @@ export default function App() {
       state.topLayer,
       state.prevLayer,
       state.stacks,
+      state.addOverhangBlock,
     ],
     shallow
   );
 
   const handleKey = (e) => {
     e.code === "Space" && setMove(false);
-    e.code === "Space" && playNextLayer(topLayer, prevLayer, stacks, resetBlocks, addBlock);
+    e.code === "Space" &&
+      playNextLayer(topLayer, prevLayer, stacks, resetBlocks, addBlock, addOverhangBlock);
     e.code === "Space" && setMove(true);
   };
   const handleClick = (e) => {
     setMove(false);
     // addBlock();
-    playNextLayer(topLayer, prevLayer, stacks, resetBlocks, addBlock);
+    playNextLayer(topLayer, prevLayer, stacks, resetBlocks, addBlock, addOverhangBlock);
     setMove(true);
   };
 
@@ -47,16 +50,21 @@ export default function App() {
         {/* <OrbitControls /> */}
         <Physics>
           <Blocks stacks={stacks} topLayer={topLayer} move={move} />
+          <OverHangs />
           {/* <Plane /> */}
         </Physics>
-        <mesh position={[-0.2947999999523283 - 2.7052000000476717 / 2, 1, 0]}>
-          <boxBufferGeometry args={[0.2947999999523283, 1, 3]} />
-          <meshNormalMaterial />
-        </mesh>
       </Canvas>
     </div>
   );
 }
+
+const OverHangs = () => {
+  const overhangsArray = useStackStore((state) => state.overhangsArray);
+
+  return overhangsArray.map((overhangInfo) => (
+    <Overhang key={overhangInfo.key} {...overhangInfo} />
+  ));
+};
 
 const Blocks = ({ stacks, topLayer, move }) => {
   const { speed } = useControls({
