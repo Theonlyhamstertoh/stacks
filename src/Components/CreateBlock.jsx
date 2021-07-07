@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import useStackStore from "./hooks/useStore";
 import { v4 as uuidv4 } from "uuid";
+import { useBox } from "@react-three/cannon";
 
 export const repositionBlockInside = (topLayer, delta, overlap, size, snapShotPosition) => {
   if (overlap === null) return;
@@ -50,6 +51,11 @@ export const Block = ({ position, color, direction, size, mass }) => {
     setBlockToCorrectLayer({ mesh: mesh.current, direction, size });
   }, []);
 
+  const [ref] = useBox(() => ({
+    type: "Static",
+    mass: 0,
+    position: [position.x, position.y, position.z],
+  }));
   const offset = 10;
   if (direction === "x" || direction === "z") {
     position[direction] = -offset;

@@ -4,6 +4,7 @@ import { createBlockData, initializeNextBlockData, repositionBlockInside } from 
 import { createOverhangBlock } from "./CreateOverhang";
 const playNextLayer = (topLayer, prevLayer, stacks, resetBlocks, addBlock, addOverhangBlock) => {
   // take snapshot of position so the time is uniform across the functions
+  console.log(topLayer);
   const snapShotPosition = topLayer.mesh.position[topLayer.direction];
   const size = topLayer.direction === "x" ? topLayer.size.x : topLayer.size.z;
   const [overlap, delta, offset] = calculateOverlapData(topLayer, prevLayer, size);

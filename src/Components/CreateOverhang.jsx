@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
-
+import { useBox } from "@react-three/cannon";
 export const createOverhangBlock = (
   snapShotPosition,
   offset,
@@ -26,7 +26,7 @@ const createOverhangData = (width, depth, x, y, z) => {
   const color = "red";
   const position = { x, y, z };
   const size = { x: width, y: 1, z: depth };
-
+  console.log(size);
   return {
     color,
     position,
@@ -36,9 +36,17 @@ const createOverhangData = (width, depth, x, y, z) => {
 };
 
 export const Overhang = ({ color, position, size }) => {
-  const mesh = useRef();
+  const [ref, api] = useBox(() => ({
+    mass: 1,
+    position: [position.x, position.y, position.z],
+    args: [size.x, size.y, size.z],
+    material: {
+      friction: 0.3,
+      restitution: 0.8,
+    },
+  }));
   return (
-    <mesh ref={mesh} position={[position.x, position.y, position.z]}>
+    <mesh ref={ref}>
       <boxBufferGeometry args={[size.x, size.y, size.z]} />
       <meshLambertMaterial color={color} />
     </mesh>

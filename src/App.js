@@ -47,11 +47,11 @@ export default function App() {
         <color attach="background" args={["#222"]} />
         <ambientLight args={[0xffffff, 0.4]} />
         <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
-        {/* <OrbitControls /> */}
+        <OrbitControls />
         <Physics>
           <Blocks stacks={stacks} topLayer={topLayer} move={move} />
           <OverHangs />
-          {/* <Plane /> */}
+          <Plane />
         </Physics>
       </Canvas>
     </div>
@@ -69,7 +69,7 @@ const OverHangs = () => {
 const Blocks = ({ stacks, topLayer, move }) => {
   const { speed } = useControls({
     speed: {
-      value: 2,
+      value: 3.5,
       min: 0,
       max: 20,
       step: 0.25,
