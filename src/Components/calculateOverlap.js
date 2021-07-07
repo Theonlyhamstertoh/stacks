@@ -2,7 +2,7 @@ const calculateOverlapData = (topLayer, prevLayer, size) => {
   // this is needed for the second block
   const direction = topLayer.direction;
   if (direction === undefined) {
-    return null;
+    return [null, null];
   }
 
   // get position of the top and prev
@@ -16,7 +16,7 @@ const calculateOverlapData = (topLayer, prevLayer, size) => {
   // calculate the part where there was overlap
   const overlap = size - offset;
 
-  return overlap;
+  return [overlap, delta];
 };
 
 export default calculateOverlapData;

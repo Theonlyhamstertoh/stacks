@@ -5,10 +5,10 @@ const playNextLayer = (topLayer, prevLayer, stacks, resetBlocks, addBlock, setMo
   // take snapshot of position so the time is uniform across the functions
   const snapShotPosition = topLayer.mesh.position[topLayer.direction];
   const size = topLayer.direction === "x" ? topLayer.size.x : topLayer.size.z;
-  const overlap = calculateOverlapData(topLayer, prevLayer, size);
+  const [overlap, delta] = calculateOverlapData(topLayer, prevLayer, size);
   if (overlap > 0 || overlap === null) {
     /* ========================== Touching ============================== */
-    repositionBlockInside(topLayer, snapShotPosition, overlap, size);
+    repositionBlockInside(topLayer, delta, overlap, size, snapShotPosition);
     const nextBlockData = initializeNextBlockData(topLayer, overlap, size);
     const nextBlock = createBlockData(stacks, nextBlockData);
     addBlock(nextBlock);

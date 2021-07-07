@@ -32,11 +32,9 @@ export default function App() {
   };
   const handleClick = (e) => {
     setMove(false);
-    // console.log(topLayer.mesh.position[topLayer.direction]);
-    playNextLayer(topLayer, prevLayer, stacks, resetBlocks, addBlock);
     // addBlock();
+    playNextLayer(topLayer, prevLayer, stacks, resetBlocks, addBlock);
     setMove(true);
-    console.log("============================");
   };
 
   return (
@@ -72,13 +70,11 @@ const Blocks = ({ stacks, topLayer, move }) => {
   useFrame(({ clock }) => {
     const direction = topLayer.direction;
     if (move) {
-      console.log("RUNNING");
       const position = topLayer.mesh.position;
       const dt = clock.getElapsedTime() - oldTime;
       position[direction] += dt * speed;
       oldTime = clock.getElapsedTime();
     } else {
-      console.log("STOPPPED");
       clock.stop();
     }
   });

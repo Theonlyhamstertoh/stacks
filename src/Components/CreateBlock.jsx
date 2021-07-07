@@ -2,15 +2,16 @@ import { useRef, useEffect } from "react";
 import useStackStore from "./hooks/useStore";
 import { v4 as uuidv4 } from "uuid";
 
-export const repositionBlockInside = (topLayer, snapShotPosition, overlap, size) => {
-  if (snapShotPosition === NaN) return;
+export const repositionBlockInside = (topLayer, delta, overlap, size, snapShotPosition) => {
+  if (overlap === null) return;
+
   topLayer.mesh.scale[topLayer.direction] = overlap / size;
-  topLayer.mesh.position[topLayer.direction] = (snapShotPosition + 0) / 2;
+  topLayer.mesh.position[topLayer.direction] = snapShotPosition - delta / 2;
 };
 
 export const initializeNextBlockData = (topLayer, overlap) => {
-  /* ========================== Touching ============================== */
-  if (topLayer.direction) return [topLayer.size.x, topLayer.size.z, -10, 0];
+  // if the topBlock is still the very first one, create second block position
+  if (topLayer.direction === undefined) return [topLayer.size.x, topLayer.size.z, -10, 0];
   const direction = topLayer.direction;
 
   // provide new data
