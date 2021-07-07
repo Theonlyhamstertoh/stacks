@@ -90,8 +90,8 @@ const INITIAL_BLOCK = {
 };
 
 const useStackStore = create((set) => ({
-  topLayer: "",
-  prevLayer: "",
+  topLayer: null,
+  prevLayer: null,
   move: false,
   stacks: [INITIAL_BLOCK],
   overhangsArray: [],

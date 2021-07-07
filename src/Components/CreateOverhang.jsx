@@ -5,21 +5,18 @@ export const createOverhangBlock = (
   snapShotPosition,
   offset,
   overlap,
-  stacks,
   topLayer,
   addOverhangBlock,
-  delta,
-  size
+  delta
 ) => {
   const overhangShift = (overlap / 2) * Math.sign(delta);
-  const xPosition =
-    topLayer.direction === "x" ? snapShotPosition + overhangShift : topLayer.mesh.position.x;
-  const zPosition =
-    topLayer.direction === "z" ? snapShotPosition + overhangShift : topLayer.mesh.position.z;
+  const overhangPosition = snapShotPosition + overhangShift;
+  const xPosition = topLayer.direction === "x" ? overhangPosition : topLayer.mesh.position.x;
+  const yPosition = topLayer.mesh.position.y;
+  const zPosition = topLayer.direction === "z" ? overhangPosition : topLayer.mesh.position.z;
   const width = topLayer.direction === "x" ? offset : topLayer.size.x;
   const depth = topLayer.direction === "z" ? offset : topLayer.size.z;
 
-  const yPosition = topLayer.mesh.position.y;
   const overhangBlock = createOverhangData(width, depth, xPosition, yPosition, zPosition);
   addOverhangBlock(overhangBlock);
 };
@@ -38,17 +35,17 @@ const createOverhangData = (width, depth, x, y, z) => {
 };
 
 export const Overhang = ({ color, position, size }) => {
-  // const [ref, api] = useBox(() => ({
-  //   mass: 1,
-  //   position: [position.x, position.y, position.z],
-  //   args: [size.x, size.y, size.z],
-  //   material: {
-  //     friction: 0.3,
-  //     restitution: 0.8,
-  //   },
-  // }));
+  const [ref] = useBox(() => ({
+    mass: 5,
+    position: [position.x, position.y, position.z],
+    args: [size.x, size.y, size.z],
+    material: {
+      friction: 0.3,
+      restitution: 0.8,
+    },
+  }));
   return (
-    <mesh position={[position.x, position.y, position.z]}>
+    <mesh ref={ref}>
       <boxBufferGeometry args={[size.x, size.y, size.z]} />
       <meshLambertMaterial color={color} />
     </mesh>

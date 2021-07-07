@@ -4,7 +4,7 @@ import { OrbitControls } from "@react-three/drei";
 import { Physics, useBox, usePlane } from "@react-three/cannon";
 import Camera from "./Components/Camera";
 import { useControls } from "leva";
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Block } from "./Components/CreateBlock";
 import useStackStore from "./Components/hooks/useStore";
 import shallow from "zustand/shallow";
@@ -36,6 +36,9 @@ export default function App() {
   const handleClick = (e) => {
     setMove(false);
     // addBlock();
+    console.log("===================");
+    console.log(topLayer.mesh.position);
+    console.log("===================");
     playNextLayer(topLayer, prevLayer, stacks, resetBlocks, addBlock, addOverhangBlock);
     setMove(true);
   };
@@ -76,17 +79,23 @@ const Blocks = ({ stacks, topLayer, move }) => {
     },
   });
   const { clock } = useThree();
+  const physicPosition = useRef(null);
+  useEffect(() => topLayer && (physicPosition.current = topLayer.mesh.position), [topLayer]);
 
   clock.start();
   let oldTime = 0;
   useFrame(({ clock }) => {
-    const direction = topLayer.direction;
-    if (move) {
-      const position = topLayer.mesh.position;
+    if (move && topLayer !== null && topLayer.mesh.position.x < 1) {
+      const current = physicPosition.current;
+      const direction = topLayer.direction;
       const dt = clock.getElapsedTime() - oldTime;
-      position[direction] += dt * speed;
+      current[direction] += dt * speed;
+      // topLayer.mesh.position[direction] += dt * speed;
+      topLayer.cannon.position.set(current.x, current.y, current.z);
+      console.log(topLayer.mesh.position);
       oldTime = clock.getElapsedTime();
     } else {
+      console.log("here");
       clock.stop();
     }
   });

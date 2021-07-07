@@ -4,23 +4,14 @@ import { createBlockData, initializeNextBlockData, repositionBlockInside } from 
 import { createOverhangBlock } from "./CreateOverhang";
 const playNextLayer = (topLayer, prevLayer, stacks, resetBlocks, addBlock, addOverhangBlock) => {
   // take snapshot of position so the time is uniform across the functions
-  console.log(topLayer);
   const snapShotPosition = topLayer.mesh.position[topLayer.direction];
+  console.log(snapShotPosition);
   const size = topLayer.direction === "x" ? topLayer.size.x : topLayer.size.z;
   const [overlap, delta, offset] = calculateOverlapData(topLayer, prevLayer, size);
   if (overlap > 0 || overlap === null) {
     /* ========================== Touching ============================== */
     stacks.length > 1 &&
-      createOverhangBlock(
-        snapShotPosition,
-        offset,
-        overlap,
-        stacks,
-        topLayer,
-        addOverhangBlock,
-        delta,
-        size
-      );
+      createOverhangBlock(snapShotPosition, offset, overlap, topLayer, addOverhangBlock, delta);
     repositionBlockInside(topLayer, delta, overlap, size, snapShotPosition);
 
     // overhang block creation

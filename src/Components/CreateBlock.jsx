@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import useStackStore from "./hooks/useStore";
 import { v4 as uuidv4 } from "uuid";
 import { useBox } from "@react-three/cannon";
+import { useFrame, useThree } from "@react-three/fiber";
 
 export const repositionBlockInside = (topLayer, delta, overlap, size, snapShotPosition) => {
   if (overlap === null) return;
@@ -38,30 +39,36 @@ export const createBlockData = (stacks, newWidth, newDepth, nextX, nextZ) => {
     key: uuidv4(),
     direction,
     size,
-    mass: 1,
   };
 };
 
-export const Block = ({ position, color, direction, size, mass }) => {
+export const Block = ({ position, color, direction, size }) => {
   const setBlockToCorrectLayer = useStackStore((state) => state.setBlockToCorrectLayer);
-
-  const mesh = useRef();
-
-  useEffect(() => {
-    setBlockToCorrectLayer({ mesh: mesh.current, direction, size });
-  }, []);
-
-  const [ref] = useBox(() => ({
-    type: "Static",
+  const move = useStackStore((state) => state.move);
+  const [ref, api] = useBox(() => ({
+    // type: "Static",
     mass: 0,
+    args: [size.x, size.y, size.z],
     position: [position.x, position.y, position.z],
   }));
+
+  // const ref = useRef();
+  // const ref = useRef();
+  useEffect(() => {
+    setBlockToCorrectLayer({
+      mesh: ref.current,
+      cannon: api,
+      direction,
+      size,
+    });
+  }, []);
+
   const offset = 10;
   if (direction === "x" || direction === "z") {
     position[direction] = -offset;
   }
   return (
-    <mesh ref={mesh} position={[position.x, position.y, position.z]}>
+    <mesh ref={ref}>
       <boxBufferGeometry args={[size.x, size.y, size.z]} />
       <meshNormalMaterial color={color} />
     </mesh>
