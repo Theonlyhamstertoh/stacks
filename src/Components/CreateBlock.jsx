@@ -11,7 +11,7 @@ export const repositionBlockInside = (topLayer, delta, overlap, size, snapShotPo
 
 export const initializeNextBlockData = (topLayer, overlap) => {
   // if the topBlock is still the very first one, create second block position
-  if (topLayer.direction === undefined) return [topLayer.size.x, topLayer.size.z, -10, 0];
+  if (topLayer.direction === null) return [topLayer.size.x, topLayer.size.z, -10, 0];
   const direction = topLayer.direction;
 
   // provide new data
@@ -24,7 +24,7 @@ export const initializeNextBlockData = (topLayer, overlap) => {
   return [newWidth, newDepth, nextX, nextZ];
 };
 
-export const createBlockData = (stacks, [newWidth, newDepth, nextX, nextZ]) => {
+export const createBlockData = (stacks, newWidth, newDepth, nextX, nextZ) => {
   const color = `hsl(${140 + stacks.length * 4}, 100%, 60%)`;
   const position = { x: nextX, y: stacks.length, z: nextZ };
   const direction = stacks.length % 2 ? "x" : "z";
@@ -38,17 +38,16 @@ export const createBlockData = (stacks, [newWidth, newDepth, nextX, nextZ]) => {
     direction,
     size,
     mass: 1,
-    move: true,
   };
 };
 
-export const Block = ({ position, color, direction, move, size, mass }) => {
+export const Block = ({ position, color, direction, size, mass }) => {
   const setBlockToCorrectLayer = useStackStore((state) => state.setBlockToCorrectLayer);
 
   const mesh = useRef();
 
   useEffect(() => {
-    setBlockToCorrectLayer({ mesh: mesh.current, direction, size, move });
+    setBlockToCorrectLayer({ mesh: mesh.current, direction, size });
   }, []);
 
   const offset = 10;

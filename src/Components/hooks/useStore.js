@@ -84,7 +84,7 @@ const INITIAL_BLOCK = {
   position: { x: 0, y: 0, z: 0 },
   size: { x: 3, y: 1, z: 3 },
   color: `hsl(${140 + 1 * 4},  100%, 60%)`,
-  direction: undefined,
+  direction: null,
   key: uuidv4(),
   mass: 0,
 };
@@ -94,14 +94,16 @@ const useStackStore = create((set) => ({
   prevLayer: "",
   move: false,
   stacks: [INITIAL_BLOCK],
+  overhangs: [],
   setBlockToCorrectLayer: (block) =>
     set((state) => ({
       prevLayer: state.topLayer,
       topLayer: block,
     })),
-  addBlock: (newLayer) => set((state) => ({ stacks: [...state.stacks, newLayer] })),
+  addBlock: (nextBlock) => set((state) => ({ stacks: [...state.stacks, nextBlock] })),
   setMove: (boolean) => set((state) => ({ move: boolean })),
   resetBlocks: () => set((state) => ({ stacks: INITIAL_BLOCK })),
+  addOverhangBlock: (newBlock) => set((state) => ({ overhangs: [...state.overhangs, newBlock] })),
 }));
 
 export default useStackStore;

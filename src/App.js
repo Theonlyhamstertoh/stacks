@@ -49,6 +49,10 @@ export default function App() {
           <Blocks stacks={stacks} topLayer={topLayer} move={move} />
           {/* <Plane /> */}
         </Physics>
+        <mesh position={[-0.2947999999523283 - 2.7052000000476717 / 2, 1, 0]}>
+          <boxBufferGeometry args={[0.2947999999523283, 1, 3]} />
+          <meshNormalMaterial />
+        </mesh>
       </Canvas>
     </div>
   );
