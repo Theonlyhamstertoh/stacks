@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import { Physics, useBox, usePlane } from "@react-three/cannon";
 import Camera from "./Components/Camera";
 import { useControls } from "leva";
@@ -44,7 +43,6 @@ export default function App() {
         <color attach="background" args={["#222"]} />
         <ambientLight args={[0xffffff, 0.4]} />
         <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
-        <OrbitControls autoRotate enabled={false}/>
         <Physics>
           <Blocks {...state} move={move} setMove={setMove} />
           <OverHangs />

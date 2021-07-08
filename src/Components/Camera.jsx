@@ -3,25 +3,39 @@ import { OrthographicCamera } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import useStackStore from "./hooks/useStore";
+import { OrbitControls } from "@react-three/drei";
 
 const Camera = () => {
   const stacks = useStackStore((state) => state.stacks);
 
-  const ref = useRef();
+  const cameraRef = useRef();
+  const controlsRef = useRef();
   const { camera } = useThree();
   const speed = 0.1;
 
-  useFrame(({ camera, clock }) => {
+  useFrame(({ camera, clock, gl, scene }) => {
     if (stacks.length - 1 > camera.position.y - 120) {
       camera.position.y += speed;
-      // camera.position.x = Math.sin(clock.getElapsedTime() * Math.PI * 2);
-      // camera.position.z = Math.cos(clock.getElapsedTime() * Math.PI * 2);
+      controlsRef.current.update();
+      console.log(stacks.length);
+      controlsRef.current.target.set(0, camera.position.y - 120, 0);
     }
   });
-
   camera.lookAt(new THREE.Vector3(0, stacks.length, 0));
   camera.updateProjectionMatrix();
 
-  return <OrthographicCamera ref={ref} makeDefault position={[100, 120, 100]} zoom={70} />;
+  return (
+    <>
+      <OrthographicCamera ref={cameraRef} makeDefault position={[100, 120, 100]} zoom={70} />
+      <OrbitControls
+        camera={cameraRef.current}
+        ref={controlsRef}
+        enableRotate={true}
+        autoRotate
+        enableZoom={false}
+      />
+      );
+    </>
+  );
 };
 export default Camera;
