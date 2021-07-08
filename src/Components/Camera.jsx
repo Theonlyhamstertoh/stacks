@@ -10,15 +10,18 @@ const Camera = () => {
   const ref = useRef();
   const { camera } = useThree();
   const speed = 0.1;
-  useFrame(({ camera }) => {
+
+  useFrame(({ camera, clock }) => {
     if (stacks.length - 1 > camera.position.y - 120) {
       camera.position.y += speed;
+      // camera.position.x = Math.sin(clock.getElapsedTime() * Math.PI * 2);
+      // camera.position.z = Math.cos(clock.getElapsedTime() * Math.PI * 2);
     }
   });
 
   camera.lookAt(new THREE.Vector3(0, stacks.length, 0));
   camera.updateProjectionMatrix();
 
-  return <OrthographicCamera ref={ref} makeDefault position={[100, 120, 100]} zoom={80} />;
+  return <OrthographicCamera ref={ref} makeDefault position={[100, 120, 100]} zoom={70} />;
 };
 export default Camera;

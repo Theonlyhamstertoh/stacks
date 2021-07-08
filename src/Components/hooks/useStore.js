@@ -86,6 +86,7 @@ const INITIAL_BLOCK = {
   color: `hsl(${140 + 1 * 4},  100%, 60%)`,
   direction: null,
   key: uuidv4(),
+  stationary: true,
   mass: 0,
 };
 
@@ -95,12 +96,28 @@ const useStackStore = create((set) => ({
   move: false,
   stacks: [INITIAL_BLOCK],
   overhangsArray: [],
-  reposition: [],
+  reposition: null,
   setReposition: (newReposition) => set((state) => ({ reposition: newReposition })),
   setBlockToCorrectLayer: (block) =>
     set((state) => ({
       prevLayer: state.topLayer,
       topLayer: block,
+    })),
+  updateBlock: (overlap, size, position) =>
+    set((state) => ({
+      stacks: state.stacks.map((block) => {
+        if (block.key === state.topLayer.key) {
+          return {
+            ...block,
+            stationary: true,
+            overlap,
+            size,
+            position,
+            key: uuidv4(),
+          };
+        }
+        return { ...block, stationary: true };
+      }),
     })),
   addBlock: (nextBlock) => set((state) => ({ stacks: [...state.stacks, nextBlock] })),
   setMove: (boolean) => set((state) => ({ move: boolean })),

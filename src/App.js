@@ -23,6 +23,7 @@ export default function App() {
       addOverhangBlock: state.addOverhangBlock,
       reposition: state.reposition,
       setReposition: state.setReposition,
+      updateBlock: state.updateBlock,
     }),
     shallow
   );
@@ -30,13 +31,10 @@ export default function App() {
   const handleKey = (e) => {
     e.code === "Space" && setMove(false);
     e.code === "Space" && playNextLayer({ ...state });
-    e.code === "Space" && setMove(true);
   };
   const handleClick = (e) => {
     setMove(false);
-
     playNextLayer({ ...state });
-    // console.log(move);
   };
 
   return (
@@ -46,7 +44,7 @@ export default function App() {
         <color attach="background" args={["#222"]} />
         <ambientLight args={[0xffffff, 0.4]} />
         <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
-        <OrbitControls />
+        <OrbitControls autoRotate enabled={false}/>
         <Physics>
           <Blocks {...state} move={move} setMove={setMove} />
           <OverHangs />
@@ -65,7 +63,7 @@ const OverHangs = () => {
   ));
 };
 
-const Blocks = ({ stacks, topLayer, move, prevLayer, setMove }) => {
+const Blocks = ({ stacks, topLayer, move, setMove }) => {
   const { speed } = useControls({
     speed: {
       value: 3.5,
@@ -77,7 +75,6 @@ const Blocks = ({ stacks, topLayer, move, prevLayer, setMove }) => {
   useEffect(() => {
     topLayer && (physicPosition.current = topLayer.mesh.position);
     setMove(true);
-    console.log(move);
   }, [topLayer]);
   const { clock } = useThree();
   const physicPosition = useRef(null);
@@ -86,22 +83,17 @@ const Blocks = ({ stacks, topLayer, move, prevLayer, setMove }) => {
   let oldTime = 0;
   useFrame(({ clock }) => {
     if (move && topLayer !== null) {
-      const current = physicPosition.current;
       const direction = topLayer.direction;
       const dt = clock.getElapsedTime() - oldTime;
-      // current[direction] += dt * speed;
       topLayer.mesh.position[direction] += dt * speed;
-      // topLayer.cannon.position.set(current.x, current.y, current.z);
       oldTime = clock.getElapsedTime();
     } else if (move === false) {
-      console.log("STOP");
       clock.stop();
     }
   });
-  return stacks.map((blockInfo) => {
-    return <Block {...blockInfo} key={blockInfo.key} />;
-  });
+  return stacks.map((blockInfo) => <Block {...blockInfo} key={blockInfo.key} id={blockInfo.key} />);
 };
+
 const Plane = () => {
   const [ref] = usePlane(() => ({ mass: 0, rotation: [-Math.PI / 2, 0, 0] }));
   return (
