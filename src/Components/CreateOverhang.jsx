@@ -1,14 +1,14 @@
 import { useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useBox } from "@react-three/cannon";
-export const createOverhangBlock = (
+export const createOverhangBlock = ({
   snapShotPosition,
   offset,
   overlap,
   topLayer,
   addOverhangBlock,
-  delta
-) => {
+  delta,
+}) => {
   const overhangShift = (overlap / 2) * Math.sign(delta);
   const overhangPosition = snapShotPosition + overhangShift;
   const xPosition = topLayer.direction === "x" ? overhangPosition : topLayer.mesh.position.x;

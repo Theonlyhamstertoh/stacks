@@ -6,7 +6,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as CANNON from "cannon-es";
 import { Html } from "@react-three/drei";
 
-export const repositionBlockInside = (topLayer, delta, overlap, size, snapShotPosition) => {
+export const repositionBlockInside = ({ topLayer, delta, overlap, size, snapShotPosition }) => {
   if (overlap === null) return;
 
   // problem is here. You can't just scale a block like this
@@ -71,7 +71,7 @@ export const Block = ({ position, color, direction, size }) => {
     position[direction] = -offset;
   }
   return (
-    <mesh ref={ref}>
+    <mesh ref={ref} position={[position.x, position.y, position.z]}>
       <boxBufferGeometry args={[size.x, size.y, size.z]} />
       <meshNormalMaterial color={color} />
     </mesh>

@@ -15,8 +15,6 @@ export default function App() {
   const [move, setMove] = useState(false);
   const state = useStackStore(
     (state) => ({
-      // state.move,
-
       addBlock: state.addBlock,
       resetBlocks: state.resetBlocks,
       topLayer: state.topLayer,
@@ -38,7 +36,7 @@ export default function App() {
     setMove(false);
 
     playNextLayer({ ...state });
-    setMove(true);
+    // console.log(move);
   };
 
   return (
@@ -50,7 +48,7 @@ export default function App() {
         <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
         <OrbitControls />
         <Physics>
-          <Blocks {...state} />
+          <Blocks {...state} move={move} setMove={setMove} />
           <OverHangs />
           <Plane />
         </Physics>
@@ -67,7 +65,7 @@ const OverHangs = () => {
   ));
 };
 
-const Blocks = ({ stacks, topLayer, move, prevLayer }) => {
+const Blocks = ({ stacks, topLayer, move, prevLayer, setMove }) => {
   const { speed } = useControls({
     speed: {
       value: 3.5,
@@ -76,20 +74,18 @@ const Blocks = ({ stacks, topLayer, move, prevLayer }) => {
       step: 0.25,
     },
   });
+  useEffect(() => {
+    topLayer && (physicPosition.current = topLayer.mesh.position);
+    setMove(true);
+    console.log(move);
+  }, [topLayer]);
   const { clock } = useThree();
   const physicPosition = useRef(null);
-  useEffect(() => topLayer && (physicPosition.current = topLayer.mesh.position), [topLayer]);
 
   clock.start();
   let oldTime = 0;
   useFrame(({ clock }) => {
-    if (
-      move &&
-      topLayer !== null &&
-      topLayer.mesh.position.x < 1 &&
-      topLayer.mesh.position.z < 1 &&
-      prevLayer
-    ) {
+    if (move && topLayer !== null) {
       const current = physicPosition.current;
       const direction = topLayer.direction;
       const dt = clock.getElapsedTime() - oldTime;
@@ -97,7 +93,8 @@ const Blocks = ({ stacks, topLayer, move, prevLayer }) => {
       topLayer.mesh.position[direction] += dt * speed;
       // topLayer.cannon.position.set(current.x, current.y, current.z);
       oldTime = clock.getElapsedTime();
-    } else {
+    } else if (move === false) {
+      console.log("STOP");
       clock.stop();
     }
   });

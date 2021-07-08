@@ -1,4 +1,4 @@
-const calculateOverlapData = (topLayer, prevLayer, size, snapShotPosition) => {
+const calculateOverlapData = ({ topLayer, prevLayer, size }) => {
   // this is needed for the second block
   const direction = topLayer.direction;
   if (direction === null) {
@@ -14,7 +14,7 @@ const calculateOverlapData = (topLayer, prevLayer, size, snapShotPosition) => {
   const offset = Math.abs(delta);
   // calculate the part where there was overlap
   const overlap = size - offset;
-  return [overlap, delta, offset, size];
+  return [overlap, delta, offset];
 };
 
 export default calculateOverlapData;
