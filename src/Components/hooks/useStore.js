@@ -95,6 +95,8 @@ const useStackStore = create((set) => ({
   move: false,
   stacks: [INITIAL_BLOCK],
   overhangsArray: [],
+  reposition: [],
+  setReposition: (newReposition) => set((state) => ({ reposition: newReposition })),
   setBlockToCorrectLayer: (block) =>
     set((state) => ({
       prevLayer: state.topLayer,

@@ -3,12 +3,17 @@ import useStackStore from "./hooks/useStore";
 import { v4 as uuidv4 } from "uuid";
 import { useBox } from "@react-three/cannon";
 import { useFrame, useThree } from "@react-three/fiber";
+import * as CANNON from "cannon-es";
+import { Html } from "@react-three/drei";
 
 export const repositionBlockInside = (topLayer, delta, overlap, size, snapShotPosition) => {
   if (overlap === null) return;
 
+  // problem is here. You can't just scale a block like this
+  const position = snapShotPosition - delta / 2;
+  // InnerBlock(position, overlap, topLayer);
   topLayer.mesh.scale[topLayer.direction] = overlap / size;
-  topLayer.mesh.position[topLayer.direction] = snapShotPosition - delta / 2;
+  topLayer.mesh.position[topLayer.direction] = position;
 };
 
 export const initializeNextBlockData = (topLayer, overlap) => {
@@ -44,20 +49,18 @@ export const createBlockData = (stacks, newWidth, newDepth, nextX, nextZ) => {
 
 export const Block = ({ position, color, direction, size }) => {
   const setBlockToCorrectLayer = useStackStore((state) => state.setBlockToCorrectLayer);
-  const move = useStackStore((state) => state.move);
-  const [ref, api] = useBox(() => ({
-    // type: "Static",
-    mass: 0,
-    args: [size.x, size.y, size.z],
-    position: [position.x, position.y, position.z],
-  }));
+  // const [ref, api] = useBox(() => ({
+  //   // type: "Static",
+  //   mass: 0,
+  //   args: [size.x, size.y, size.z],
+  //   position: [position.x, position.y, position.z],
+  // }));
 
-  // const ref = useRef();
-  // const ref = useRef();
+  const ref = useRef();
   useEffect(() => {
     setBlockToCorrectLayer({
       mesh: ref.current,
-      cannon: api,
+      // cannon: api,
       direction,
       size,
     });
@@ -71,6 +74,29 @@ export const Block = ({ position, color, direction, size }) => {
     <mesh ref={ref}>
       <boxBufferGeometry args={[size.x, size.y, size.z]} />
       <meshNormalMaterial color={color} />
+    </mesh>
+  );
+};
+
+export const InnerBlock = (position, overlap, topLayer) => {
+  const direction = topLayer.direction;
+
+  const newWidth = direction === "x" ? overlap : topLayer.size.x;
+  const newDepth = direction === "z" ? overlap : topLayer.size.z;
+
+  const x = direction === "x" ? position : topLayer.mesh.position.x;
+  const z = direction === "z" ? position : topLayer.mesh.position.z;
+
+  const [ref, api] = useBox(() => ({
+    mass: 0,
+    args: [newWidth, topLayer.size.y, newDepth],
+    position: [x, topLayer.mesh.position.y, z],
+  }));
+
+  return (
+    <mesh ref={ref}>
+      <boxBufferGeometry args={[newWidth, topLayer.size.y, newDepth]} />
+      <meshNormalMaterial />
     </mesh>
   );
 };

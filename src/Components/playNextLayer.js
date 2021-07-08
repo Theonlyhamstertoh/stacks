@@ -2,12 +2,25 @@ import calculateOverlapData from "./calculateOverlap";
 import gameOver from "./gameOver";
 import { createBlockData, initializeNextBlockData, repositionBlockInside } from "./CreateBlock";
 import { createOverhangBlock } from "./CreateOverhang";
-const playNextLayer = (topLayer, prevLayer, stacks, resetBlocks, addBlock, addOverhangBlock) => {
+const playNextLayer = ({
+  topLayer,
+  prevLayer,
+  stacks,
+  resetBlocks,
+  addBlock,
+  addOverhangBlock,
+  reposition,
+  setReposition,
+}) => {
   // take snapshot of position so the time is uniform across the functions
   const snapShotPosition = topLayer.mesh.position[topLayer.direction];
-  console.log(snapShotPosition);
   const size = topLayer.direction === "x" ? topLayer.size.x : topLayer.size.z;
-  const [overlap, delta, offset] = calculateOverlapData(topLayer, prevLayer, size);
+  const [overlap, delta, offset] = calculateOverlapData(
+    topLayer,
+    prevLayer,
+    size,
+    snapShotPosition
+  );
   if (overlap > 0 || overlap === null) {
     /* ========================== Touching ============================== */
     stacks.length > 1 &&

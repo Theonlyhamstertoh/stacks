@@ -13,33 +13,31 @@ import { Overhang } from "./Components/CreateOverhang";
 
 export default function App() {
   const [move, setMove] = useState(false);
-  const [addBlock, resetBlocks, topLayer, prevLayer, stacks, addOverhangBlock] = useStackStore(
-    (state) => [
+  const state = useStackStore(
+    (state) => ({
       // state.move,
 
-      state.addBlock,
-      state.resetBlocks,
-      state.topLayer,
-      state.prevLayer,
-      state.stacks,
-      state.addOverhangBlock,
-    ],
+      addBlock: state.addBlock,
+      resetBlocks: state.resetBlocks,
+      topLayer: state.topLayer,
+      prevLayer: state.prevLayer,
+      stacks: state.stacks,
+      addOverhangBlock: state.addOverhangBlock,
+      reposition: state.reposition,
+      setReposition: state.setReposition,
+    }),
     shallow
   );
 
   const handleKey = (e) => {
     e.code === "Space" && setMove(false);
-    e.code === "Space" &&
-      playNextLayer(topLayer, prevLayer, stacks, resetBlocks, addBlock, addOverhangBlock);
+    e.code === "Space" && playNextLayer({ ...state });
     e.code === "Space" && setMove(true);
   };
   const handleClick = (e) => {
     setMove(false);
-    // addBlock();
-    console.log("===================");
-    console.log(topLayer.mesh.position);
-    console.log("===================");
-    playNextLayer(topLayer, prevLayer, stacks, resetBlocks, addBlock, addOverhangBlock);
+
+    playNextLayer({ ...state });
     setMove(true);
   };
 
@@ -52,7 +50,7 @@ export default function App() {
         <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
         <OrbitControls />
         <Physics>
-          <Blocks stacks={stacks} topLayer={topLayer} move={move} />
+          <Blocks {...state} />
           <OverHangs />
           <Plane />
         </Physics>
@@ -69,7 +67,7 @@ const OverHangs = () => {
   ));
 };
 
-const Blocks = ({ stacks, topLayer, move }) => {
+const Blocks = ({ stacks, topLayer, move, prevLayer }) => {
   const { speed } = useControls({
     speed: {
       value: 3.5,
@@ -85,17 +83,21 @@ const Blocks = ({ stacks, topLayer, move }) => {
   clock.start();
   let oldTime = 0;
   useFrame(({ clock }) => {
-    if (move && topLayer !== null && topLayer.mesh.position.x < 1) {
+    if (
+      move &&
+      topLayer !== null &&
+      topLayer.mesh.position.x < 1 &&
+      topLayer.mesh.position.z < 1 &&
+      prevLayer
+    ) {
       const current = physicPosition.current;
       const direction = topLayer.direction;
       const dt = clock.getElapsedTime() - oldTime;
-      current[direction] += dt * speed;
-      // topLayer.mesh.position[direction] += dt * speed;
-      topLayer.cannon.position.set(current.x, current.y, current.z);
-      console.log(topLayer.mesh.position);
+      // current[direction] += dt * speed;
+      topLayer.mesh.position[direction] += dt * speed;
+      // topLayer.cannon.position.set(current.x, current.y, current.z);
       oldTime = clock.getElapsedTime();
     } else {
-      console.log("here");
       clock.stop();
     }
   });
