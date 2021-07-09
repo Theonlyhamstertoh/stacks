@@ -7,10 +7,9 @@ import { OrbitControls } from "@react-three/drei";
 import { useControls } from "leva";
 import { useSpring, animated, config } from "@react-spring/three";
 
-const Camera = () => {
+const Camera = ({ group }) => {
   const stacks = useStackStore((state) => state.stacks);
   const gameOver = useStackStore((state) => state.gameOver);
-  const [rotate, setRotate] = useState(false);
   const { rotateCamera } = useControls({
     rotateCamera: false,
   });
@@ -19,41 +18,30 @@ const Camera = () => {
   const { camera } = useThree();
   const speed = 0.1;
 
-  useEffect(() => {
-    gameOver && setRotate(true);
-    camera.lookAt(new THREE.Vector3(0, 0, 0));
-  }, [gameOver]);
   const stackPosition = stacks.length / 2;
+
+  useEffect(() => {
+    camera.lookAt(new THREE.Vector3(0, stackPosition, 0));
+    camera.updateProjectionMatrix();
+  });
+
+  const time = useRef(0);
   useFrame(({ camera, clock }) => {
     if (!gameOver && stackPosition - 0.5 > camera.position.y - 120) {
       camera.position.y += speed;
-      controlsRef.current.target.set(0, camera.position.y - 120, 0);
-      // if(camera.zoom !==)
     }
-    if (gameOver && camera.zoom > 30 && camera.position.y > 120) {
-      camera.position.y -= speed;
-      camera.zoom -= speed;
-      console.log(camera.position.y - 120);
+    group.current.rotation > 0 && (group.current.rotation.y -= speed);
+    if (gameOver) {
+      if (camera.position.y > 120) camera.position.y -= speed;
+      group.current.position.y > -10 && (group.current.position.y -= speed);
+      group.current.rotation.y += speed / 8;
+      if (camera.zoom > 20) camera.zoom -= speed * 4;
+      time.current += 0.01;
 
-      controlsRef.current.target.set(0, camera.position.y - 120, 0);
       camera.updateProjectionMatrix();
     }
   });
-  camera.lookAt(new THREE.Vector3(0, stackPosition, 0));
-  camera.updateProjectionMatrix();
 
-  return (
-    <>
-      <OrthographicCamera ref={cameraRef} makeDefault position={[100, 120, 100]} zoom={60} />
-      <OrbitControls
-        camera={cameraRef.current}
-        ref={controlsRef}
-        enableRotate={false}
-        autoRotate={rotate ? true : false}
-        enableZoom={false}
-      />
-      );
-    </>
-  );
+  return <OrthographicCamera ref={cameraRef} makeDefault position={[100, 120, 100]} zoom={60} />;
 };
 export default Camera;

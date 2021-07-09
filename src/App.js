@@ -28,6 +28,7 @@ export default function App() {
       setReposition: state.setReposition,
       updateBlock: state.updateBlock,
       resetStore: state.resetStore,
+      gameOver: state.gameOver,
     }),
     shallow
   );
@@ -41,18 +42,25 @@ export default function App() {
     playNextLayer({ ...state, setPoints });
   };
 
+  const ref = useRef();
   return (
     <div className="fullScreen" onClick={handleClick} onKeyDown={handleKey} tabIndex={-1}>
-      <Canvas gl={{ antialias: true }} dpr={Math.max(window.devicePixelRatio, 2)}>
-        <Camera />
+      <Canvas
+        gl={{ antialias: true, shadowMap: THREE.PCFSoftShadowMap }}
+        dpr={Math.max(window.devicePixelRatio, 2)}
+        shadows
+      >
+        <Camera group={ref} />
         <color attach="background" args={["#222"]} />
-        <ambientLight args={[0xffffff, 0.4]} />
-        <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
-        <Physics debug={{ color: "white", scale: 1.1 }} gravity={[0, -50, 0]}>
-          <Blocks {...state} />
-          <OverHangs />
-          <Ground size={[4, 0.5, 4]} position={[0, -0.5, 0]} layer={1} />
-          <Ground size={[5, 3.5, 5]} position={[0, -2.5, 0]} layer={2} />
+        <ambientLight args={[0xffffff, 0.3]} />
+        <directionalLight args={[0xffffff, 0.8]} position={[50, 100, 50]} castShadow />
+        <Physics broadphase="SAP" debug={{ color: "white", scale: 1.1 }} gravity={[0, -50, 0]}>
+          <group ref={ref}>
+            <Blocks {...state} />
+            <OverHangs />
+            <Ground size={[4, 0.5, 4]} position={[0, -0.5, 0]} layer={1} />
+            <Ground size={[5, 3.5, 5]} position={[0, -2.5, 0]} layer={2} />
+          </group>
           {/* <Plane /> */}
         </Physics>
       </Canvas>
@@ -69,7 +77,7 @@ const Ground = ({ position, size, layer }) => {
     position,
   }));
   return (
-    <mesh ref={block1}>
+    <mesh ref={block1} receiveShadow castShadow>
       <boxBufferGeometry args={size} />
       <meshLambertMaterial color={color} />
     </mesh>

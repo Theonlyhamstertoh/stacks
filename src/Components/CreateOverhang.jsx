@@ -54,7 +54,7 @@ export const Overhang = ({ color, position, size }) => {
   }));
 
   return (
-    <mesh ref={ref}>
+    <mesh ref={ref} receiveShadow castShadow>
       <boxBufferGeometry args={[size.x, size.y, size.z]} />
       <meshLambertMaterial color={color} />
     </mesh>
