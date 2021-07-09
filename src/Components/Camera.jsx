@@ -20,19 +20,22 @@ const Camera = () => {
 
   useEffect(() => {
     gameOver && setRotate(true);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
   }, [gameOver]);
   const stackPosition = stacks.length / 2;
   useFrame(({ camera, clock }) => {
     if (stackPosition - 0.5 > camera.position.y - 120) {
       camera.position.y += speed;
-      // controlsRef.current.target.set(0, camera.position.y - 120, 0);
+      controlsRef.current.target.set(0, camera.position.y - 120, 0);
       // if(camera.zoom !==)
     }
     if (gameOver && camera.zoom > 30 && camera.position.y > 120) {
       camera.position.y = camera.position.y - speed;
-      // camera.zoom -= speed;
-      // controlsRef.current.target.set(0, camera.position.y - 120, 0);
-      // camera.updateProjectionMatrix();
+      camera.zoom -= speed;
+      console.log(camera.position.y - 120);
+
+      controlsRef.current.target.set(0, camera.position.y - 120, 0);
+      camera.updateProjectionMatrix();
     }
   });
   camera.lookAt(new THREE.Vector3(0, stackPosition, 0));
@@ -40,12 +43,12 @@ const Camera = () => {
 
   return (
     <>
-      <OrthographicCamera ref={cameraRef} makeDefault position={[100, 120, 100]} zoom={70} />
+      <OrthographicCamera ref={cameraRef} makeDefault position={[100, 120, 100]} zoom={60} />
       <OrbitControls
         camera={cameraRef.current}
         ref={controlsRef}
-        // enableRotate={false}
-        // autoRotate={rotate ? true : false}
+        enableRotate={false}
+        autoRotate={rotate ? true : false}
         enableZoom={false}
       />
       );
