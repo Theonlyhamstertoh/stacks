@@ -9,6 +9,7 @@ import useStackStore from "./Components/hooks/useStore";
 import shallow from "zustand/shallow";
 import playNextLayer from "./Components/playNextLayer";
 import { Overhang } from "./Components/CreateOverhang";
+import { Html } from "@react-three/drei";
 
 export default function App() {
   const brickDrop = useMemo(() => new Audio("sounds/brickDrop.wav"));
@@ -37,7 +38,7 @@ export default function App() {
   };
   const handleClick = (e) => {
     state.setMove(false);
-    playNextLayer({ ...state });
+    playNextLayer({ ...state, setPoints });
   };
 
   return (
@@ -55,6 +56,7 @@ export default function App() {
           {/* <Plane /> */}
         </Physics>
       </Canvas>
+      <div className="flexCenterTop">{points}</div>
     </div>
   );
 }

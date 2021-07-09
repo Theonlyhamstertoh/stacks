@@ -15,7 +15,7 @@ const playNextLayer = (state) => {
     if (overlap !== null) {
       brickDrop.currentTime = 0;
       brickDrop.play();
-
+      state.setPoints((prev) => prev + 1);
       createOverhangBlock({ ...state, snapShotPosition, delta, overlap, offset });
       const position = repositionBlockInside({
         size,
