@@ -12,7 +12,6 @@ export const repositionBlockInside = ({ topLayer, delta, overlap, size, snapShot
 
   topLayer.mesh.scale[topLayer.direction] = overlap / size;
   topLayer.mesh.position[topLayer.direction] = position;
-  console.log(topLayer.mesh.position.x);
   return position;
 };
 
@@ -70,16 +69,15 @@ export const Block = ({ position, color, direction, size, id, stationary }) => {
       direction,
       size,
     });
-    console.log(position);
   }, []);
-  const offset = 10;
+  const offset = 5;
   if (!stationary && direction !== null) {
     position[direction] = -offset;
   }
 
   return (
     <mesh ref={stationary ? physicRef : ref} position={[position.x, position.y, position.z]}>
-      <boxBufferGeometry args={[size.x, size.y, size.z, 50, 50, 50]} />
+      <boxBufferGeometry args={[size.x, size.y, size.z]} />
       <meshNormalMaterial color={color} />
     </mesh>
   );

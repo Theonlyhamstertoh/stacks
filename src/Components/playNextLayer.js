@@ -25,16 +25,13 @@ const playNextLayer = (state) => {
     }
 
     // overhang block creation
-
     const nextBlockData = initializeNextBlockData(state.topLayer, overlap, state.updateBlock);
     const nextBlock = createBlockData(state.stacks, ...nextBlockData);
 
     state.addBlock(nextBlock);
   } else if (overlap < 0) {
-    gameOver();
+    gameOver(true);
     state.resetStore();
-
-    // state.resetStore();
   }
 };
 

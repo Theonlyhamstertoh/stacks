@@ -45,7 +45,7 @@ export default function App() {
         <color attach="background" args={["#222"]} />
         <ambientLight args={[0xffffff, 0.4]} />
         <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
-        <Physics>
+        <Physics debug={{ color: "white", scale: 1.1 }} gravity={[0, -50, 0]}>
           <Blocks {...state} />
           <OverHangs />
           <Plane />
@@ -66,7 +66,7 @@ const OverHangs = () => {
 const Blocks = ({ stacks, topLayer, move, setMove }) => {
   const { speed } = useControls({
     speed: {
-      value: 3.5,
+      value: 5.5,
       min: 0,
       max: 20,
       step: 0.25,

@@ -42,10 +42,11 @@ const useStackStore = create((set) => ({
       }),
     })),
   addBlock: (nextBlock) => set((state) => ({ stacks: [...state.stacks, nextBlock] })),
-  setMove: (boolean) => set((state) => ({ move: boolean })),
+  setMove: (boolean) => set(() => ({ move: boolean })),
   resetStore: () => {
-    useStackStore.setState(savedState, true);
-    set((state) => ({ stacks: [{ ...INITIAL_BLOCK, key: uuidv4() }] }));
+    // useStackStore.setState(savedState, true);
+    // set(() => ({ stacks: [{ ...INITIAL_BLOCK, key: uuidv4() }] }));
+    set(() => ({ gameOver: true }));
   },
   addOverhangBlock: (newBlock) =>
     set((state) => ({ overhangsArray: [...state.overhangsArray, newBlock] })),
