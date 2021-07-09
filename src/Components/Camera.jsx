@@ -6,6 +6,7 @@ import useStackStore from "./hooks/useStore";
 import { OrbitControls } from "@react-three/drei";
 import { useControls } from "leva";
 import { useSpring, animated, config } from "@react-spring/three";
+
 const Camera = () => {
   const stacks = useStackStore((state) => state.stacks);
   const gameOver = useStackStore((state) => state.gameOver);
@@ -24,13 +25,13 @@ const Camera = () => {
   }, [gameOver]);
   const stackPosition = stacks.length / 2;
   useFrame(({ camera, clock }) => {
-    if (stackPosition - 0.5 > camera.position.y - 120) {
+    if (!gameOver && stackPosition - 0.5 > camera.position.y - 120) {
       camera.position.y += speed;
       controlsRef.current.target.set(0, camera.position.y - 120, 0);
       // if(camera.zoom !==)
     }
     if (gameOver && camera.zoom > 30 && camera.position.y > 120) {
-      camera.position.y = camera.position.y - speed;
+      camera.position.y -= speed;
       camera.zoom -= speed;
       console.log(camera.position.y - 120);
 

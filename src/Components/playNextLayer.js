@@ -2,8 +2,9 @@ import calculateOverlapData from "./calculateOverlap";
 import gameOver from "./gameOver";
 import { createBlockData, initializeNextBlockData, repositionBlockInside } from "./CreateBlock";
 import { createOverhangBlock } from "./CreateOverhang";
-
-const brickDrop = new Audio("/sounds/brickDrop.wav");
+import brickDropAudio from "../assets/sounds/brickdrop.wav";
+const brickDrop = new Audio(brickDropAudio);
+// const brickDrop = new Audio("/sounds/brickDrop.wav");
 const playNextLayer = (state) => {
   // take snapshot of position so the time is uniform across the functions
   const snapShotPosition = state.topLayer.mesh.position[state.topLayer.direction];
