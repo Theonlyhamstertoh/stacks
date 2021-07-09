@@ -17,14 +17,22 @@ export const createOverhangBlock = ({
   const width = topLayer.direction === "x" ? offset : topLayer.size.x;
   const depth = topLayer.direction === "z" ? offset : topLayer.size.z;
 
-  const overhangBlock = createOverhangData(width, depth, xPosition, yPosition, zPosition);
+  const overhangBlock = createOverhangData(
+    width,
+    depth,
+    xPosition,
+    yPosition,
+    zPosition,
+    topLayer.color
+  );
+  console.log(topLayer);
   addOverhangBlock(overhangBlock);
 };
 
-const createOverhangData = (width, depth, x, y, z) => {
+const createOverhangData = (width, depth, x, y, z, color) => {
   // const color = `hsl(${140 + y * 4}, 100%, 60%)`;
-  const color = "red";
   const position = { x, y, z };
+  console.log(color);
   const size = { x: width, y: 0.5, z: depth };
   return {
     color,

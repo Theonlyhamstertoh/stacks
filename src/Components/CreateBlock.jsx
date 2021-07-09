@@ -36,7 +36,7 @@ export const initializeNextBlockData = (topLayer, overlap, updateBlock) => {
 };
 
 export const createBlockData = (stacks, newWidth, newDepth, nextX, nextZ) => {
-  const color = `hsl(${140 + stacks.length * 4}, 100%, 60%)`;
+  const color = `hsl(${200 + stacks.length * 4},50%, 50%)`;
   const position = { x: nextX, y: stacks.length / 2, z: nextZ };
   const direction = stacks.length % 2 ? "x" : "z";
   const size = { x: newWidth, y: 0.5, z: newDepth };
@@ -69,6 +69,7 @@ export const Block = ({ position, color, direction, size, id, stationary }) => {
       key: id,
       direction,
       size,
+      color,
     });
   }, []);
   const offset = 5;
@@ -79,7 +80,7 @@ export const Block = ({ position, color, direction, size, id, stationary }) => {
   return (
     <mesh ref={stationary ? physicRef : ref} position={[position.x, position.y, position.z]}>
       <boxBufferGeometry args={[size.x, size.y, size.z]} />
-      <meshNormalMaterial color={color} />
+      <meshLambertMaterial color={color} />
     </mesh>
   );
 };
