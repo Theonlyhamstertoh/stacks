@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-spring/three": "^9.2.3",
     "@react-three/cannon": "^2.5.0",
     "@react-three/drei": "^7.0.2",
     "@react-three/fiber": "^7.0.1",

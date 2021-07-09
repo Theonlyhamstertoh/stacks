@@ -11,10 +11,11 @@ import playNextLayer from "./Components/playNextLayer";
 import { Overhang } from "./Components/CreateOverhang";
 
 export default function App() {
-  const [move, setMove] = useState(false);
   const state = useStackStore(
     (state) => ({
       addBlock: state.addBlock,
+      move: state.move,
+      setMove: state.setMove,
       resetBlocks: state.resetBlocks,
       topLayer: state.topLayer,
       prevLayer: state.prevLayer,
@@ -23,16 +24,17 @@ export default function App() {
       reposition: state.reposition,
       setReposition: state.setReposition,
       updateBlock: state.updateBlock,
+      resetStore: state.resetStore,
     }),
     shallow
   );
 
   const handleKey = (e) => {
-    e.code === "Space" && setMove(false);
+    e.code === "Space" && state.setMove(false);
     e.code === "Space" && playNextLayer({ ...state });
   };
   const handleClick = (e) => {
-    setMove(false);
+    state.setMove(false);
     playNextLayer({ ...state });
   };
 
@@ -44,7 +46,7 @@ export default function App() {
         <ambientLight args={[0xffffff, 0.4]} />
         <directionalLight args={[0xffffff, 0.6]} position={[50, 100, 50]} />
         <Physics>
-          <Blocks {...state} move={move} setMove={setMove} />
+          <Blocks {...state} />
           <OverHangs />
           <Plane />
         </Physics>

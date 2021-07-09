@@ -2,9 +2,8 @@ import { useRef, useEffect } from "react";
 import useStackStore from "./hooks/useStore";
 import { v4 as uuidv4 } from "uuid";
 import { useBox } from "@react-three/cannon";
-import { useFrame, useThree } from "@react-three/fiber";
-import * as CANNON from "cannon-es";
-import { Html } from "@react-three/drei";
+import { Html, MeshWobbleMaterial } from "@react-three/drei";
+import { MeshNormalMaterial } from "three";
 
 export const repositionBlockInside = ({ topLayer, delta, overlap, size, snapShotPosition }) => {
   // problem is here. You can't just scale a block like this
@@ -80,7 +79,7 @@ export const Block = ({ position, color, direction, size, id, stationary }) => {
 
   return (
     <mesh ref={stationary ? physicRef : ref} position={[position.x, position.y, position.z]}>
-      <boxBufferGeometry args={[size.x, size.y, size.z]} />
+      <boxBufferGeometry args={[size.x, size.y, size.z, 50, 50, 50]} />
       <meshNormalMaterial color={color} />
     </mesh>
   );

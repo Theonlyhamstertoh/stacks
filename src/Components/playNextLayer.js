@@ -2,9 +2,7 @@ import calculateOverlapData from "./calculateOverlap";
 import gameOver from "./gameOver";
 import { createBlockData, initializeNextBlockData, repositionBlockInside } from "./CreateBlock";
 import { createOverhangBlock } from "./CreateOverhang";
-import * as CANNON from "cannon-es";
 
-const world = new CANNON.World();
 const playNextLayer = (state) => {
   // take snapshot of position so the time is uniform across the functions
   const snapShotPosition = state.topLayer.mesh.position[state.topLayer.direction];
@@ -34,6 +32,9 @@ const playNextLayer = (state) => {
     state.addBlock(nextBlock);
   } else if (overlap < 0) {
     gameOver();
+    state.resetStore();
+
+    // state.resetStore();
   }
 };
 

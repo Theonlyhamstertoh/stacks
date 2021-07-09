@@ -36,12 +36,12 @@ const createOverhangData = (width, depth, x, y, z) => {
 
 export const Overhang = ({ color, position, size }) => {
   const [ref] = useBox(() => ({
-    mass: 10,
+    mass: 100,
     position: [position.x, position.y, position.z],
     args: [size.x, size.y, size.z],
     material: {
       friction: 0.2,
-      restitution: 0.8,
+      restitution: 0.1,
     },
   }));
   return (
