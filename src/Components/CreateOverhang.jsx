@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useBox } from "@react-three/cannon";
 export const createOverhangBlock = ({
@@ -25,7 +25,7 @@ const createOverhangData = (width, depth, x, y, z) => {
   // const color = `hsl(${140 + y * 4}, 100%, 60%)`;
   const color = "red";
   const position = { x, y, z };
-  const size = { x: width, y: 1, z: depth };
+  const size = { x: width, y: 0.5, z: depth };
   return {
     color,
     position,
@@ -44,6 +44,7 @@ export const Overhang = ({ color, position, size }) => {
       restitution: 0.7,
     },
   }));
+
   return (
     <mesh ref={ref}>
       <boxBufferGeometry args={[size.x, size.y, size.z]} />

@@ -21,8 +21,9 @@ const Camera = () => {
   useEffect(() => {
     gameOver && setRotate(true);
   }, [gameOver]);
+  const stackPosition = stacks.length / 2;
   useFrame(({ camera, clock }) => {
-    if (stacks.length - 1 > camera.position.y - 120) {
+    if (stackPosition - 0.5 > camera.position.y - 120) {
       camera.position.y += speed;
       // controlsRef.current.target.set(0, camera.position.y - 120, 0);
       // if(camera.zoom !==)
@@ -35,7 +36,7 @@ const Camera = () => {
       // camera.updateProjectionMatrix();
     }
   });
-  camera.lookAt(new THREE.Vector3(0, stacks.length, 0));
+  camera.lookAt(new THREE.Vector3(0, stackPosition, 0));
   camera.updateProjectionMatrix();
 
   return (

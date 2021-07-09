@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Physics, useBox, usePlane } from "@react-three/cannon";
 import Camera from "./Components/Camera";
 import { useControls } from "leva";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { Block } from "./Components/CreateBlock";
 import useStackStore from "./Components/hooks/useStore";
 import shallow from "zustand/shallow";
@@ -11,6 +11,7 @@ import playNextLayer from "./Components/playNextLayer";
 import { Overhang } from "./Components/CreateOverhang";
 
 export default function App() {
+  const brickDrop = useMemo(() => new Audio("sounds/brickDrop.wav"));
   const state = useStackStore(
     (state) => ({
       addBlock: state.addBlock,
@@ -95,7 +96,11 @@ const Blocks = ({ stacks, topLayer, move, setMove }) => {
 };
 
 const Plane = () => {
-  const [ref] = usePlane(() => ({ mass: 0, rotation: [-Math.PI / 2, 0, 0] }));
+  const [ref] = usePlane(() => ({
+    mass: 0,
+    rotation: [-Math.PI / 2, 0, 0],
+    position: [0, -0.25, 0],
+  }));
   return (
     <mesh ref={ref}>
       <planeBufferGeometry args={[100, 100]} />

@@ -3,6 +3,7 @@ import gameOver from "./gameOver";
 import { createBlockData, initializeNextBlockData, repositionBlockInside } from "./CreateBlock";
 import { createOverhangBlock } from "./CreateOverhang";
 
+const brickDrop = new Audio("sounds/brickDrop.wav");
 const playNextLayer = (state) => {
   // take snapshot of position so the time is uniform across the functions
   const snapShotPosition = state.topLayer.mesh.position[state.topLayer.direction];
@@ -12,6 +13,9 @@ const playNextLayer = (state) => {
   if (overlap > 0 || overlap === null) {
     /* ========================== Touching ============================== */
     if (overlap !== null) {
+      brickDrop.currentTime = 0;
+      brickDrop.play();
+
       createOverhangBlock({ ...state, snapShotPosition, delta, overlap, offset });
       const position = repositionBlockInside({
         size,
