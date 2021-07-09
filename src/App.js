@@ -12,6 +12,7 @@ import { Overhang } from "./Components/CreateOverhang";
 
 export default function App() {
   const brickDrop = useMemo(() => new Audio("sounds/brickDrop.wav"));
+  const [points, setPoints] = useState(0);
   const state = useStackStore(
     (state) => ({
       addBlock: state.addBlock,
@@ -49,13 +50,29 @@ export default function App() {
         <Physics debug={{ color: "white", scale: 1.1 }} gravity={[0, -50, 0]}>
           <Blocks {...state} />
           <OverHangs />
-          <Plane />
+          <Ground size={[4, 0.5, 4]} position={[0, -0.5, 0]} layer={1} />
+          <Ground size={[5, 3.5, 5]} position={[0, -2.5, 0]} layer={2} />
+          {/* <Plane /> */}
         </Physics>
       </Canvas>
     </div>
   );
 }
 
+const Ground = ({ position, size, layer }) => {
+  const color = `hsl(${40 - layer * 12},50%, 90%)`;
+  const [block1] = useBox(() => ({
+    mass: 0,
+    args: size,
+    position,
+  }));
+  return (
+    <mesh ref={block1}>
+      <boxBufferGeometry args={size} />
+      <meshLambertMaterial color={color} />
+    </mesh>
+  );
+};
 const OverHangs = () => {
   const overhangsArray = useStackStore((state) => state.overhangsArray);
 

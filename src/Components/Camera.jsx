@@ -31,7 +31,6 @@ const Camera = () => {
     if (gameOver && camera.zoom > 30 && camera.position.y > 120) {
       camera.position.y = camera.position.y - speed;
       // camera.zoom -= speed;
-      console.log(camera.position.y);
       // controlsRef.current.target.set(0, camera.position.y - 120, 0);
       // camera.updateProjectionMatrix();
     }
@@ -42,13 +41,13 @@ const Camera = () => {
   return (
     <>
       <OrthographicCamera ref={cameraRef} makeDefault position={[100, 120, 100]} zoom={70} />
-      {/* <OrbitControls
+      <OrbitControls
         camera={cameraRef.current}
         ref={controlsRef}
-        enableRotate={false}
-        autoRotate={rotate ? true : false}
+        // enableRotate={false}
+        // autoRotate={rotate ? true : false}
         enableZoom={false}
-      /> */}
+      />
       );
     </>
   );
