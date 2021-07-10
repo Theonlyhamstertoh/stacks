@@ -6,7 +6,7 @@ import { useControls } from "leva";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { Block } from "./Components/CreateBlock";
 import useStackStore from "./Components/hooks/useStore";
-import useGame from "./Components/playNextLayer";
+import useGame from "./Components/useGame";
 import { Overhang } from "./Components/CreateOverhang";
 import { Html, Stars, Sky } from "@react-three/drei";
 
@@ -17,8 +17,6 @@ export default function App() {
     document.body.onclick = (e) => handlePress(e);
     document.body.onkeydown = (e) => handlePress(e);
   });
-  const color = useColor();
-  const ref = useRef();
   return (
     <>
       <div className="scoreBox">
@@ -26,26 +24,33 @@ export default function App() {
         <div className="lvl">Level {lvl.lvl}</div>
       </div>
 
-      <div className="fullScreen">
-        <Canvas gl={{ antialias: true, shadowMap: THREE.PCFShadowMap }} dpr={Math.max(window.devicePixelRatio, 2)} shadows>
-          <Camera group={ref} gameOver={gameOver} />
-          <color attach="background" args={[color]} />
-          <ambientLight args={[0xffffff, 0.3]} />
-          <directionalLight args={[0xffffff, 0.8]} position={[50, 100, 50]} castShadow />
-          <Physics broadphase="SAP" gravity={[0, -50, 0]}>
-            <group ref={ref}>
-              <Blocks />
-              <OverHangs />
-              <Ground size={[4, 0.5, 4]} position={[0, -0.5, 0]} layer={1} />
-              <Ground size={[5, 3.5, 5]} position={[0, -2.5, 0]} layer={2} />
-            </group>
-          </Physics>
-        </Canvas>
-      </div>
+      <Scene gameOver={gameOver} />
     </>
   );
 }
 
+const Scene = ({ gameOver }) => {
+  const ref = useRef();
+  const color = useColor();
+  return (
+    <div className="fullScreen">
+      <Canvas gl={{ antialias: true, shadowMap: THREE.PCFShadowMap }} dpr={Math.max(window.devicePixelRatio, 2)} shadows>
+        <Camera group={ref} gameOver={gameOver} />
+        <color attach="background" args={[color]} />
+        <ambientLight args={[0xffffff, 0.3]} />
+        <directionalLight args={[0xffffff, 0.8]} position={[50, 100, 50]} castShadow />
+        <Physics broadphase="SAP" gravity={[0, -50, 0]}>
+          <group ref={ref}>
+            <Blocks />
+            <OverHangs />
+            <Ground size={[4, 0.5, 4]} position={[0, -0.5, 0]} layer={1} />
+            <Ground size={[5, 3.5, 5]} position={[0, -2.5, 0]} layer={2} />
+          </group>
+        </Physics>
+      </Canvas>
+    </div>
+  );
+};
 const useColor = () => {
   const stacks = useStackStore((state) => state.stacks);
   const color = `hsl(${40 + stacks.length * 6},90%, 7%)`;
