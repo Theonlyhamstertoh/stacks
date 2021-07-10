@@ -1,14 +1,7 @@
-import { useRef, useMemo, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useBox } from "@react-three/cannon";
-export const createOverhangBlock = ({
-  snapShotPosition,
-  offset,
-  overlap,
-  topLayer,
-  addOverhangBlock,
-  delta,
-}) => {
+
+export const createOverhangBlock = ({ snapShotPosition, offset, overlap, topLayer, addOverhangBlock, delta }) => {
   const overhangShift = (overlap / 2) * Math.sign(delta);
   const overhangPosition = snapShotPosition + overhangShift;
   const xPosition = topLayer.direction === "x" ? overhangPosition : topLayer.mesh.position.x;
@@ -17,29 +10,14 @@ export const createOverhangBlock = ({
   const width = topLayer.direction === "x" ? offset : topLayer.size.x;
   const depth = topLayer.direction === "z" ? offset : topLayer.size.z;
 
-  const overhangBlock = createOverhangData(
-    width,
-    depth,
-    xPosition,
-    yPosition,
-    zPosition,
-    topLayer.color
-  );
-  console.log(topLayer);
-  addOverhangBlock(overhangBlock);
-};
-
-const createOverhangData = (width, depth, x, y, z, color) => {
-  // const color = `hsl(${140 + y * 4}, 100%, 60%)`;
-  const position = { x, y, z };
-  console.log(color);
-  const size = { x: width, y: 0.5, z: depth };
-  return {
-    color,
-    position,
+  const overhangData = {
+    size: { x: width, y: 0.5, z: depth },
+    position: { x: xPosition, y: yPosition, z: zPosition },
     key: uuidv4(),
-    size,
+    color: topLayer.color,
   };
+
+  addOverhangBlock(overhangData);
 };
 
 export const Overhang = ({ color, position, size }) => {

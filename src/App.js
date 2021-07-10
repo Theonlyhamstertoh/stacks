@@ -6,68 +6,51 @@ import { useControls } from "leva";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { Block } from "./Components/CreateBlock";
 import useStackStore from "./Components/hooks/useStore";
-import shallow from "zustand/shallow";
-import playNextLayer from "./Components/playNextLayer";
+import useGame from "./Components/playNextLayer";
 import { Overhang } from "./Components/CreateOverhang";
-import { Html } from "@react-three/drei";
+import { Html, Stars, Sky } from "@react-three/drei";
 
 export default function App() {
-  const brickDrop = useMemo(() => new Audio("sounds/brickDrop.wav"));
-  const [points, setPoints] = useState(0);
-  const state = useStackStore(
-    (state) => ({
-      addBlock: state.addBlock,
-      move: state.move,
-      setMove: state.setMove,
-      resetBlocks: state.resetBlocks,
-      topLayer: state.topLayer,
-      prevLayer: state.prevLayer,
-      stacks: state.stacks,
-      addOverhangBlock: state.addOverhangBlock,
-      reposition: state.reposition,
-      setReposition: state.setReposition,
-      updateBlock: state.updateBlock,
-      resetStore: state.resetStore,
-      gameOver: state.gameOver,
-    }),
-    shallow
-  );
+  const { handlePress, startGame, gameOver, pauseGame, playGame, playNextLayer, points, lvl } = useGame();
 
-  const handleKey = (e) => {
-    e.code === "Space" && state.setMove(false);
-    e.code === "Space" && playNextLayer({ ...state });
-  };
-  const handleClick = (e) => {
-    state.setMove(false);
-    playNextLayer({ ...state, setPoints });
-  };
-
+  useEffect(() => {
+    document.body.onclick = (e) => handlePress(e);
+    document.body.onkeydown = (e) => handlePress(e);
+  });
+  const color = useColor();
   const ref = useRef();
   return (
-    <div className="fullScreen" onClick={handleClick} onKeyDown={handleKey} tabIndex={-1}>
-      <Canvas
-        gl={{ antialias: true, shadowMap: THREE.PCFSoftShadowMap }}
-        dpr={Math.max(window.devicePixelRatio, 2)}
-        shadows
-      >
-        <Camera group={ref} />
-        <color attach="background" args={["#222"]} />
-        <ambientLight args={[0xffffff, 0.3]} />
-        <directionalLight args={[0xffffff, 0.8]} position={[50, 100, 50]} castShadow />
-        <Physics broadphase="SAP" debug={{ color: "white", scale: 1.1 }} gravity={[0, -50, 0]}>
-          <group ref={ref}>
-            <Blocks {...state} />
-            <OverHangs />
-            <Ground size={[4, 0.5, 4]} position={[0, -0.5, 0]} layer={1} />
-            <Ground size={[5, 3.5, 5]} position={[0, -2.5, 0]} layer={2} />
-          </group>
-          {/* <Plane /> */}
-        </Physics>
-      </Canvas>
-      <div className="flexCenterTop">{points}</div>
-    </div>
+    <>
+      <div className="scoreBox">
+        <div className="points">{points.score}</div>
+        <div className="lvl">Level {lvl.lvl}</div>
+      </div>
+
+      <div className="fullScreen">
+        <Canvas gl={{ antialias: true, shadowMap: THREE.PCFShadowMap }} dpr={Math.max(window.devicePixelRatio, 2)} shadows>
+          <Camera group={ref} gameOver={gameOver} />
+          <color attach="background" args={[color]} />
+          <ambientLight args={[0xffffff, 0.3]} />
+          <directionalLight args={[0xffffff, 0.8]} position={[50, 100, 50]} castShadow />
+          <Physics broadphase="SAP" gravity={[0, -50, 0]}>
+            <group ref={ref}>
+              <Blocks />
+              <OverHangs />
+              <Ground size={[4, 0.5, 4]} position={[0, -0.5, 0]} layer={1} />
+              <Ground size={[5, 3.5, 5]} position={[0, -2.5, 0]} layer={2} />
+            </group>
+          </Physics>
+        </Canvas>
+      </div>
+    </>
   );
 }
+
+const useColor = () => {
+  const stacks = useStackStore((state) => state.stacks);
+  const color = `hsl(${40 + stacks.length * 6},90%, 7%)`;
+  return color;
+};
 
 const Ground = ({ position, size, layer }) => {
   const color = `hsl(${40 - layer * 12},50%, 90%)`;
@@ -86,12 +69,11 @@ const Ground = ({ position, size, layer }) => {
 const OverHangs = () => {
   const overhangsArray = useStackStore((state) => state.overhangsArray);
 
-  return overhangsArray.map((overhangInfo) => (
-    <Overhang key={overhangInfo.key} {...overhangInfo} />
-  ));
+  return overhangsArray.map((overhangInfo) => <Overhang key={overhangInfo.key} {...overhangInfo} />);
 };
 
-const Blocks = ({ stacks, topLayer, move, setMove }) => {
+const Blocks = () => {
+  const [stacks, topLayer, setMove, move] = useStackStore((state) => [state.stacks, state.topLayer, state.setMove, state.move]);
   const { speed } = useControls({
     speed: {
       value: 5.5,

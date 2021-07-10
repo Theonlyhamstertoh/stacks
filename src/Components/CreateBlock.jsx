@@ -2,14 +2,9 @@ import { useRef, useEffect } from "react";
 import useStackStore from "./hooks/useStore";
 import { v4 as uuidv4 } from "uuid";
 import { useBox } from "@react-three/cannon";
-import { Html, MeshWobbleMaterial } from "@react-three/drei";
-import { MeshNormalMaterial } from "three";
 
 export const repositionBlockInside = ({ topLayer, delta, overlap, size, snapShotPosition }) => {
-  // problem is here. You can't just scale a block like this
   const position = snapShotPosition - delta / 2;
-  // InnerBlock(position, overlap, topLayer);
-
   topLayer.mesh.scale[topLayer.direction] = overlap / size;
   topLayer.mesh.position[topLayer.direction] = position;
   return position;
@@ -27,11 +22,9 @@ export const initializeNextBlockData = (topLayer, overlap, updateBlock) => {
   const nextX = direction === "x" ? position.x : -10;
   const nextZ = direction === "z" ? position.z : -10;
 
-  updateBlock(
-    overlap,
-    { x: newWidth, y: topLayer.size.y, z: newDepth },
-    { x: position.x, y: position.y, z: position.z }
-  );
+  const newSize = { x: newWidth, y: topLayer.size.y, z: newDepth };
+  const newPos = { x: position.x, y: position.y, z: position.z };
+  updateBlock(overlap, newSize, newPos, true, true);
   return [newWidth, newDepth, nextX, nextZ];
 };
 
@@ -48,41 +41,39 @@ export const createBlockData = (stacks, newWidth, newDepth, nextX, nextZ) => {
     key: uuidv4(),
     direction,
     stationary: false,
+    addPhysics: false,
     size,
     overlap: null,
   };
 };
 
-export const Block = ({ position, color, direction, size, id, stationary }) => {
+export const Block = ({ position, color, direction, addPhysics, size, id, stationary }) => {
   const setBlockToCorrectLayer = useStackStore((state) => state.setBlockToCorrectLayer);
 
   const [physicRef, api] = useBox(() => ({
-    mass: 0,
+    mass: stationary ? 0 : 1,
     args: [size.x, size.y, size.z],
     position: [position.x, position.y, position.z],
   }));
 
   const ref = useRef();
   useEffect(() => {
-    setBlockToCorrectLayer({
-      mesh: stationary ? physicRef.current : ref.current,
+    const block = {
+      mesh: addPhysics ? physicRef.current : ref.current,
       key: id,
       direction,
       size,
       color,
-    });
+    };
+    setBlockToCorrectLayer(block);
   }, []);
   const offset = 5;
-  if (!stationary && direction !== null) {
+  if (!addPhysics && direction !== null) {
     position[direction] = -offset;
   }
 
   return (
-    <mesh
-      ref={stationary ? physicRef : ref}
-      position={[position.x, position.y, position.z]}
-      receiveShadow
-    >
+    <mesh ref={addPhysics ? physicRef : ref} position={[position.x, position.y, position.z]} receiveShadow>
       <boxBufferGeometry args={[size.x, size.y, size.z]} />
       <meshLambertMaterial color={color} />
     </mesh>
