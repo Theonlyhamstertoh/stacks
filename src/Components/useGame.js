@@ -23,7 +23,8 @@ const useGame = () => {
     setPlayGame(true);
     points.resetScore();
     lvl.resetLvl();
-    state.resetStore();
+    state.makeBlocksFall();
+    // state.resetStore();
   };
   const pauseGame = () => {
     setGameOver(false);

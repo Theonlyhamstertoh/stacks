@@ -8,6 +8,7 @@ const INITIAL_BLOCK = {
   direction: null,
   key: uuidv4(),
   stationary: true,
+  addPhysics: true,
   mass: 0,
 };
 
@@ -41,6 +42,12 @@ const useStackStore = create((set) => ({
         return { ...block, stationary: true };
       }),
     })),
+  makeBlocksFall: () =>
+    set((state) => {
+      const makeAllBlocksFall = state.stacks.map((block) => ({ ...block, stationary: false, key: uuidv4() }));
+      console.log(makeAllBlocksFall);
+      return { stacks: makeAllBlocksFall };
+    }),
   addBlock: (nextBlock) => set((state) => ({ stacks: [...state.stacks, nextBlock] })),
   setMove: (boolean) => set(() => ({ move: boolean })),
   resetStore: () => {

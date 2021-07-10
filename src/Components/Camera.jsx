@@ -4,6 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import useStackStore from "./hooks/useStore";
 import { CameraHelper } from "three";
+import { useSpring, animated } from "@react-spring/three";
 
 const Camera = ({ group, gameOver }) => {
   const stacks = useStackStore((state) => state.stacks);
@@ -40,10 +41,10 @@ const defaultCameraPosition = (camera, groupPosition, groupRotation, speed, stac
   // rotate the group back to the origin position
   groupPosition.y < 0 && (groupPosition.y += speed);
 
-  if (parseFloat(toFullCircle.toFixed(1)) !== 1.0 || toFullCircle === 0) {
-    groupRotation.y += speed / 4;
-  }
-  camera.zoom < 60 && (camera.zoom += speed * 4);
+  // if (parseFloat(toFullCircle.toFixed(1)) !== 1.0 && toFullCircle !== 0) {
+  //   groupRotation.y += speed;
+  // }
+  // camera.zoom < 60 && (camera.zoom += speed * 4);
   camera.updateProjectionMatrix();
 };
 const zoomOutAndSpin = (camera, groupPosition, groupRotation, speed) => {

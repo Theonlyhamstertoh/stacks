@@ -9,7 +9,7 @@ import useStackStore from "./Components/hooks/useStore";
 import useGame from "./Components/useGame";
 import { Overhang } from "./Components/CreateOverhang";
 import { Html, Stars, Sky } from "@react-three/drei";
-import { useSpring, animated } from "@react-spring/web";
+import { useSpring, animated } from "@react-spring/three";
 export default function App() {
   const { handlePress, gameOver, resetGame, pauseGame, playGame, playNextLayer, points, lvl } = useGame();
 
@@ -38,12 +38,11 @@ export default function App() {
 const Scene = ({ gameOver }) => {
   const ref = useRef();
 
-  const props = useSpring({ background: useColor(-2, 40, 50, 10) });
-
   return (
-    <animated.div className="fullScreen" style={props}>
+    <div className="fullScreen">
       <Canvas gl={{ antialias: true, shadowMap: THREE.PCFShadowMap }} dpr={Math.max(window.devicePixelRatio, 2)} shadows>
         <Camera group={ref} gameOver={gameOver} />
+        <color attach="background" args={[useColor(2, 40, 50, 10)]} />
         <ambientLight args={[0xffffff, 0.3]} />
         <directionalLight args={[0xffffff, 0.8]} position={[50, 100, 50]} castShadow />
         <Physics broadphase="SAP" gravity={[0, -50, 0]}>
@@ -55,7 +54,7 @@ const Scene = ({ gameOver }) => {
           </group>
         </Physics>
       </Canvas>
-    </animated.div>
+    </div>
   );
 };
 const useColor = (factor, hue, sat, light) => {
