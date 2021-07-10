@@ -9,9 +9,9 @@ import useStackStore from "./Components/hooks/useStore";
 import useGame from "./Components/useGame";
 import { Overhang } from "./Components/CreateOverhang";
 import { Html, Stars, Sky } from "@react-three/drei";
-
+import { animated } from "@react-spring/three";
 export default function App() {
-  const { handlePress, startGame, gameOver, pauseGame, playGame, playNextLayer, points, lvl } = useGame();
+  const { handlePress, gameOver, resetGame, pauseGame, playGame, playNextLayer, points, lvl } = useGame();
 
   useEffect(() => {
     document.body.onclick = (e) => handlePress(e);
@@ -19,11 +19,17 @@ export default function App() {
   });
   return (
     <>
-      <div className="scoreBox">
-        <div className="points">{points.score}</div>
-        <div className="lvl">Level {lvl.lvl}</div>
+      <div className="gameContainer">
+        <div className="scoreBox">
+          <div className="points">{points.score}</div>
+          <div className="lvl">Level {lvl.lvl}</div>
+        </div>
+        {gameOver && (
+          <button className="gameButton" onClick={resetGame}>
+            Play Again
+          </button>
+        )}
       </div>
-
       <Scene gameOver={gameOver} />
     </>
   );
@@ -53,7 +59,7 @@ const Scene = ({ gameOver }) => {
 };
 const useColor = () => {
   const stacks = useStackStore((state) => state.stacks);
-  const color = `hsl(${40 + stacks.length * 6},90%, 7%)`;
+  const color = `hsl(${40 + stacks.length * 4},90%, 10%)`;
   return color;
 };
 

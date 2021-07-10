@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 const INITIAL_BLOCK = {
   position: { x: 0, y: 0, z: 0 },
   size: { x: 3, y: 0.5, z: 3 },
-  color: `hsl(${40 + 1 * 6},50%, 60%)`,
+  color: `hsl(${40 + 1 * 2},50%, 50%)`,
   direction: null,
   key: uuidv4(),
   stationary: true,

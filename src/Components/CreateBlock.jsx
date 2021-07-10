@@ -29,7 +29,7 @@ export const initializeNextBlockData = (topLayer, overlap, updateBlock) => {
 };
 
 export const createBlockData = (stacks, newWidth, newDepth, nextX, nextZ) => {
-  const color = `hsl(${40 + stacks.length * 6},50%, 50%)`;
+  const color = `hsl(${40 + stacks.length * 2},50%, 50%)`;
   const position = { x: nextX, y: stacks.length / 2, z: nextZ };
   const direction = stacks.length % 2 ? "x" : "z";
   const size = { x: newWidth, y: 0.5, z: newDepth };

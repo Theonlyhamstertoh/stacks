@@ -14,17 +14,17 @@ const useGame = () => {
   const state = useStackStore();
   const lvl = useLvl();
 
-  useEffect(() => console.log(state.topLayer, state.prevLayer), [state]);
   useEffect(() => {
     points.score % 10 === 0 && points.score !== 0 && lvl.nextLvl();
   }, [points.score]);
 
-  const startGame = () => {
+  const resetGame = () => {
     setGameOver(false);
     setPlayGame(true);
-    state.resetScore();
+    points.resetScore();
+    lvl.resetLvl();
+    state.resetStore();
   };
-
   const pauseGame = () => {
     setGameOver(false);
     setPlayGame(false);
@@ -71,10 +71,11 @@ const useGame = () => {
   };
 
   const handlePress = (e) => {
+    if (e.target.classList.contains("gameButton")) return;
     e.code === "Space" || (e.code === undefined && state.setMove(false));
     e.code === "Space" || (e.code === undefined && playNextLayer());
   };
-  return { startGame, gameOver, pauseGame, playGame, playNextLayer, handlePress, points, lvl };
+  return { gameOver, pauseGame, playGame, playNextLayer, handlePress, points, lvl, resetGame };
 };
 
 const useScore = () => {
