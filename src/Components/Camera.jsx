@@ -10,8 +10,6 @@ const Camera = ({ group, gameOver }) => {
   console.log(stacks);
   const { camera } = useThree();
 
-  const ref = useRef();
-  useHelper(ref, CameraHelper, "cyan");
   const speed = 0.1;
   const stackPosition = stacks.length / 2;
 
@@ -25,29 +23,38 @@ const Camera = ({ group, gameOver }) => {
     const groupRotation = group.current.rotation;
     const groupPosition = group.current.position;
 
-    const toFullCircle = (groupRotation.y % (Math.PI * 2)) / (Math.PI * 2);
-
     if (gameOver === false) {
-      // move the camera to the height of the topLayer
-      stackPosition - 0.5 > camera.position.y - 120 && (camera.position.y += speed);
-      // rotate the group back to the origin position
-      groupPosition.y < 0 && (groupPosition.y += speed);
-      parseFloat(toFullCircle.toFixed(1)) !== 1.0 && (groupRotation.y += speed / 4);
-      camera.zoom < 60 && (camera.zoom += speed * 4);
-      camera.updateProjectionMatrix();
+      defaultCameraPosition(camera, groupPosition, groupRotation, speed, stackPosition);
     } else if (gameOver === true) {
-      // zoom out and position camera to original position
-      camera.position.y > 120 && (camera.position.y -= speed);
-      camera.zoom > 20 && (camera.zoom -= speed * 4);
-
-      // spin the group and put it a bit lower.
-      groupPosition.y > -10 && (groupPosition.y -= speed);
-      groupRotation.y += speed / 8;
-
-      camera.updateProjectionMatrix();
+      zoomOutAndSpin(camera, groupPosition, groupRotation, speed);
     }
   });
 
-  return <OrthographicCamera ref={ref} makeDefault position={[100, 120, 100]} zoom={60} />;
+  return <OrthographicCamera makeDefault position={[100, 120, 100]} zoom={60} />;
+};
+
+const defaultCameraPosition = (camera, groupPosition, groupRotation, speed, stackPosition) => {
+  const toFullCircle = (groupRotation.y % (Math.PI * 2)) / (Math.PI * 2);
+  // move the camera to the height of the topLayer
+  stackPosition - 0.5 > camera.position.y - 120 && (camera.position.y += speed);
+  // rotate the group back to the origin position
+  groupPosition.y < 0 && (groupPosition.y += speed);
+
+  if (parseFloat(toFullCircle.toFixed(1)) !== 1.0 || toFullCircle === 0) {
+    groupRotation.y += speed / 4;
+  }
+  camera.zoom < 60 && (camera.zoom += speed * 4);
+  camera.updateProjectionMatrix();
+};
+const zoomOutAndSpin = (camera, groupPosition, groupRotation, speed) => {
+  // zoom out and position camera to original position
+  camera.position.y > 120 && (camera.position.y -= speed);
+  camera.zoom > 20 && (camera.zoom -= speed * 4);
+
+  // spin the group and put it a bit lower.
+  groupPosition.y > -10 && (groupPosition.y -= speed);
+  groupRotation.y += speed / 8;
+
+  camera.updateProjectionMatrix();
 };
 export default Camera;

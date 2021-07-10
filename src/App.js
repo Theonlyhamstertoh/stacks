@@ -9,7 +9,7 @@ import useStackStore from "./Components/hooks/useStore";
 import useGame from "./Components/useGame";
 import { Overhang } from "./Components/CreateOverhang";
 import { Html, Stars, Sky } from "@react-three/drei";
-import { animated } from "@react-spring/three";
+import { useSpring, animated } from "@react-spring/web";
 export default function App() {
   const { handlePress, gameOver, resetGame, pauseGame, playGame, playNextLayer, points, lvl } = useGame();
 
@@ -37,12 +37,13 @@ export default function App() {
 
 const Scene = ({ gameOver }) => {
   const ref = useRef();
-  const color = useColor();
+
+  const props = useSpring({ background: useColor(-2, 40, 50, 10) });
+
   return (
-    <div className="fullScreen">
+    <animated.div className="fullScreen" style={props}>
       <Canvas gl={{ antialias: true, shadowMap: THREE.PCFShadowMap }} dpr={Math.max(window.devicePixelRatio, 2)} shadows>
         <Camera group={ref} gameOver={gameOver} />
-        <color attach="background" args={[color]} />
         <ambientLight args={[0xffffff, 0.3]} />
         <directionalLight args={[0xffffff, 0.8]} position={[50, 100, 50]} castShadow />
         <Physics broadphase="SAP" gravity={[0, -50, 0]}>
@@ -54,12 +55,12 @@ const Scene = ({ gameOver }) => {
           </group>
         </Physics>
       </Canvas>
-    </div>
+    </animated.div>
   );
 };
-const useColor = () => {
+const useColor = (factor, hue, sat, light) => {
   const stacks = useStackStore((state) => state.stacks);
-  const color = `hsl(${40 + stacks.length * 4},90%, 10%)`;
+  const color = `hsl(${hue + stacks.length * factor},${sat}%, ${light}%)`;
   return color;
 };
 
