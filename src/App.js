@@ -1,17 +1,14 @@
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Physics, useBox, usePlane } from "@react-three/cannon";
+import { Physics, useBox } from "@react-three/cannon";
 import Camera from "./Components/Camera";
-import { useControls } from "leva";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useRef } from "react";
 import { Block } from "./Components/CreateBlock";
 import useStackStore from "./Components/hooks/useStore";
 import useGame from "./Components/useGame";
 import { Overhang } from "./Components/CreateOverhang";
-import { Html, Stars, Sky } from "@react-three/drei";
-import { useSpring, animated } from "@react-spring/three";
 export default function App() {
-  const { handlePress, gameOver, resetGame, pauseGame, playGame, playNextLayer, points, lvl } = useGame();
+  const { handlePress, gameOver, resetGame, points, lvl, destroyTower, speed } = useGame();
 
   useEffect(() => {
     document.body.onclick = (e) => handlePress(e);
@@ -21,21 +18,19 @@ export default function App() {
     <>
       <div className="gameContainer">
         <div className="scoreBox">
-          <div className="points">{points.score}</div>
+          <div className="points">{lvl.score}</div>
           <div className="lvl">Level {lvl.lvl}</div>
+          <div className="speed">Speed: {speed - 4}x</div>
         </div>
-        {gameOver && (
-          <button className="gameButton" onClick={resetGame}>
-            Play Again
-          </button>
-        )}
+        {gameOver && <input type="button" value="play again" className="gameButton" onClick={resetGame} />}
+        {gameOver && <input type="button" value="Destroy Tower" className="gameButton" onClick={destroyTower} />}
       </div>
-      <Scene gameOver={gameOver} />
+      <Scene gameOver={gameOver} speed={speed} />
     </>
   );
 }
 
-const Scene = ({ gameOver }) => {
+const Scene = ({ gameOver, speed }) => {
   const ref = useRef();
 
   return (
@@ -45,9 +40,9 @@ const Scene = ({ gameOver }) => {
         <color attach="background" args={[useColor(2, 40, 50, 10)]} />
         <ambientLight args={[0xffffff, 0.3]} />
         <directionalLight args={[0xffffff, 0.8]} position={[50, 100, 50]} castShadow />
-        <Physics broadphase="SAP" gravity={[0, -50, 0]}>
+        <Physics broadphase="SAP" gravity={[0, -50, 0]} allowSleep={true}>
           <group ref={ref}>
-            <Blocks />
+            <Blocks speed={speed} />
             <OverHangs />
             <Ground size={[4, 0.5, 4]} position={[0, -0.5, 0]} layer={1} />
             <Ground size={[5, 3.5, 5]} position={[0, -2.5, 0]} layer={2} />
@@ -57,6 +52,7 @@ const Scene = ({ gameOver }) => {
     </div>
   );
 };
+
 const useColor = (factor, hue, sat, light) => {
   const stacks = useStackStore((state) => state.stacks);
   const color = `hsl(${hue + stacks.length * factor},${sat}%, ${light}%)`;
@@ -83,16 +79,9 @@ const OverHangs = () => {
   return overhangsArray.map((overhangInfo) => <Overhang key={overhangInfo.key} {...overhangInfo} />);
 };
 
-const Blocks = () => {
+const Blocks = ({ speed }) => {
   const [stacks, topLayer, setMove, move] = useStackStore((state) => [state.stacks, state.topLayer, state.setMove, state.move]);
-  const { speed } = useControls({
-    speed: {
-      value: 5.5,
-      min: 0,
-      max: 20,
-      step: 0.25,
-    },
-  });
+
   useEffect(() => {
     topLayer && (physicPosition.current = topLayer.mesh.position);
     setMove(true);
@@ -113,18 +102,4 @@ const Blocks = () => {
     }
   });
   return stacks.map((blockInfo) => <Block {...blockInfo} key={blockInfo.key} id={blockInfo.key} />);
-};
-
-const Plane = () => {
-  const [ref] = usePlane(() => ({
-    mass: 0,
-    rotation: [-Math.PI / 2, 0, 0],
-    position: [0, -0.25, 0],
-  }));
-  return (
-    <mesh ref={ref}>
-      <planeBufferGeometry args={[100, 100]} />
-      <meshLambertMaterial color="#141817" />
-    </mesh>
-  );
 };

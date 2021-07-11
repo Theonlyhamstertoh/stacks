@@ -8,32 +8,18 @@ import useStackStore from "./hooks/useStore";
 const brickDrop = new Audio(brickDropAudio);
 
 const useGame = () => {
-  const [playGame, setPlayGame] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-  const points = useScore();
   const state = useStackStore();
   const lvl = useLvl();
 
-  useEffect(() => {
-    points.score % 10 === 0 && points.score !== 0 && lvl.nextLvl();
-  }, [points.score]);
-
   const resetGame = () => {
     setGameOver(false);
-    setPlayGame(true);
-    points.resetScore();
     lvl.resetLvl();
-    state.makeBlocksFall();
-    // state.resetStore();
-  };
-  const pauseGame = () => {
-    setGameOver(false);
-    setPlayGame(false);
+    state.resetStore();
   };
 
-  const endGame = () => {
-    setGameOver(true);
-    setPlayGame(false);
+  const destroyTower = () => {
+    state.makeBlocksFall();
   };
 
   const playNextLayer = () => {
@@ -46,7 +32,7 @@ const useGame = () => {
       /* ========================== Touching ============================== */
       if (overlap !== null) {
         playAudio();
-        points.updateScore(1);
+        lvl.updateScore(1);
         createOverhangBlock({ ...state, snapShotPosition, delta, overlap, offset });
         const pos = repositionBlockInside({
           size,
@@ -65,7 +51,7 @@ const useGame = () => {
 
       state.addBlock(nextBlock);
     } else if (overlap < 0) {
-      endGame();
+      setGameOver(true);
       console.log(state.topLayer);
       state.updateBlock(null, state.topLayer.size, state.topLayer.mesh.position, false, true);
     }
@@ -73,10 +59,11 @@ const useGame = () => {
 
   const handlePress = (e) => {
     if (e.target.classList.contains("gameButton")) return;
-    e.code === "Space" || (e.code === undefined && state.setMove(false));
-    e.code === "Space" || (e.code === undefined && playNextLayer());
+    if (gameOver === true) return;
+    (e.code === "Space" || e.code === undefined) && state.setMove(false);
+    (e.code === "Space" || e.code === undefined) && playNextLayer();
   };
-  return { gameOver, pauseGame, playGame, playNextLayer, handlePress, points, lvl, resetGame };
+  return { gameOver, resetGame, handlePress, lvl, destroyTower, speed: lvl.speed };
 };
 
 const useScore = () => {
@@ -94,30 +81,40 @@ const useScore = () => {
   return { score, highScore, resetScore, updateScore };
 };
 
+const useSpeed = () => {
+  const [speed, setSpeed] = useState(5);
+
+  const increaseSpeed = () => {
+    setSpeed((prevSpeed) => prevSpeed + 0.5);
+  };
+
+  const resetSpeed = () => {
+    setSpeed(5);
+  };
+
+  return { speed, increaseSpeed, resetSpeed };
+};
 export const useLvl = () => {
   const [lvl, setLvl] = useState(1);
-  const [isInitialLvl, setIsInitialLvl] = useState(true);
+  const speed = useSpeed();
+  const points = useScore();
+
+  useEffect(() => {
+    points.score % 10 === 0 && points.score !== 0 && nextLvl();
+  }, [points.score]);
   const nextLvl = () => {
-    setIsInitialLvl(false);
     setLvl((prevLvl) => prevLvl + 1);
+    speed.increaseSpeed();
   };
   const resetLvl = () => {
-    setIsInitialLvl(true);
     setLvl(1);
+    speed.resetSpeed();
+    points.resetScore();
   };
-  return { lvl, nextLvl, resetLvl, isInitialLvl };
+  return { lvl, nextLvl, resetLvl, ...speed, ...points };
 };
 
-const useWitchMode = () => {};
-
-const useLambMode = () => {};
-
-const useRabbitMode = () => {};
-
-const useHealth = () => {};
-
-const expandBlock = () => {};
-const playAudio = () => {
+export const playAudio = () => {
   brickDrop.currentTime = 0;
   brickDrop.play();
 };

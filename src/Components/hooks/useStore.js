@@ -44,9 +44,9 @@ const useStackStore = create((set) => ({
     })),
   makeBlocksFall: () =>
     set((state) => {
-      const makeAllBlocksFall = state.stacks.map((block) => ({ ...block, stationary: false, key: uuidv4() }));
-      console.log(makeAllBlocksFall);
-      return { stacks: makeAllBlocksFall };
+      const makeAllBlocksFall = state.stacks.map((block) => ({ ...block, stationary: false, key: uuidv4(), explode: true }));
+      const makeOverhangBlocksFly = state.overhangsArray.map((block) => ({ ...block, explode: true, key: uuidv4() }));
+      return { stacks: makeAllBlocksFall, overhangsArray: makeOverhangBlocksFly };
     }),
   addBlock: (nextBlock) => set((state) => ({ stacks: [...state.stacks, nextBlock] })),
   setMove: (boolean) => set(() => ({ move: boolean })),

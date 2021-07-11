@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import useStackStore from "./hooks/useStore";
 import { v4 as uuidv4 } from "uuid";
 import { useBox } from "@react-three/cannon";
+import { playAudio } from "./useGame";
 
 export const repositionBlockInside = ({ topLayer, delta, overlap, size, snapShotPosition }) => {
   const position = snapShotPosition - delta / 2;
@@ -42,20 +43,26 @@ export const createBlockData = (stacks, newWidth, newDepth, nextX, nextZ) => {
     direction,
     stationary: false,
     addPhysics: false,
+    explode: false,
     size,
     overlap: null,
   };
 };
 
-export const Block = ({ position, color, direction, addPhysics, size, id, stationary }) => {
+export const Block = ({ position, color, direction, addPhysics, size, id, stationary, explode }) => {
   const setBlockToCorrectLayer = useStackStore((state) => state.setBlockToCorrectLayer);
 
   const [physicRef, api] = useBox(() => ({
     mass: stationary ? 0 : 1,
     args: [size.x, size.y, size.z],
     position: [position.x, position.y, position.z],
+    // velocity: [0, 80, -20],
+    // angularVelocity: [10, 20, 30],
   }));
 
+  useEffect(() => {
+    explode && api.applyForce([500 * Math.random(), 1700, 500 * Math.random()], [5, 2, 5]);
+  }, []);
   const ref = useRef();
   useEffect(() => {
     const block = {
