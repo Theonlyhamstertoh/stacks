@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react";
 import useStackStore from "./hooks/useStore";
 import { v4 as uuidv4 } from "uuid";
 import { useBox } from "@react-three/cannon";
-import { playAudio } from "./useGame";
+import { playAudio } from "./hooks/useGame";
 
 export const repositionBlockInside = ({ topLayer, delta, overlap, size, snapShotPosition }) => {
   const position = snapShotPosition - delta / 2;

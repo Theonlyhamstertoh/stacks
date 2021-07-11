@@ -1,9 +1,10 @@
-import calculateOverlapData from "./calculateOverlap";
-import { createBlockData, initializeNextBlockData, repositionBlockInside } from "./CreateBlock";
-import { createOverhangBlock } from "./CreateOverhang";
-import brickDropAudio from "../assets/sounds/brickdrop.wav";
+import calculateOverlapData from "../calculateOverlap";
+import { createBlockData, initializeNextBlockData, repositionBlockInside } from "../CreateBlock";
+import { createOverhangBlock } from "../CreateOverhang";
+import brickDropAudio from "../../assets/sounds/brickdrop.wav";
 import { useState, useEffect } from "react";
-import useStackStore from "./hooks/useStore";
+import useStackStore from "./useStore";
+import useLvl from "./useLvl";
 
 const brickDrop = new Audio(brickDropAudio);
 
@@ -64,54 +65,6 @@ const useGame = () => {
     (e.code === "Space" || e.code === undefined) && playNextLayer();
   };
   return { gameOver, resetGame, handlePress, lvl, destroyTower, speed: lvl.speed };
-};
-
-const useScore = () => {
-  const [score, setScore] = useState(0);
-  const [highScore, setHighScore] = useState(0);
-
-  const resetScore = () => setScore(0);
-  const updateScore = (points) => {
-    setScore((prevScore) => {
-      const newScore = prevScore + points;
-      highScore < newScore && setHighScore(newScore);
-      return newScore;
-    });
-  };
-  return { score, highScore, resetScore, updateScore };
-};
-
-const useSpeed = () => {
-  const [speed, setSpeed] = useState(5);
-
-  const increaseSpeed = () => {
-    setSpeed((prevSpeed) => prevSpeed + 0.5);
-  };
-
-  const resetSpeed = () => {
-    setSpeed(5);
-  };
-
-  return { speed, increaseSpeed, resetSpeed };
-};
-export const useLvl = () => {
-  const [lvl, setLvl] = useState(1);
-  const speed = useSpeed();
-  const points = useScore();
-
-  useEffect(() => {
-    points.score % 10 === 0 && points.score !== 0 && nextLvl();
-  }, [points.score]);
-  const nextLvl = () => {
-    setLvl((prevLvl) => prevLvl + 1);
-    speed.increaseSpeed();
-  };
-  const resetLvl = () => {
-    setLvl(1);
-    speed.resetSpeed();
-    points.resetScore();
-  };
-  return { lvl, nextLvl, resetLvl, ...speed, ...points };
 };
 
 export const playAudio = () => {

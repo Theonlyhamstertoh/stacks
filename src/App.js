@@ -5,8 +5,9 @@ import Camera from "./Components/Camera";
 import { useEffect, useRef } from "react";
 import { Block } from "./Components/CreateBlock";
 import useStackStore from "./Components/hooks/useStore";
-import useGame from "./Components/useGame";
+import useGame from "./Components/hooks/useGame";
 import { Overhang } from "./Components/CreateOverhang";
+import useColor from "./Components/hooks/useColor";
 export default function App() {
   const { handlePress, gameOver, resetGame, points, lvl, destroyTower, speed } = useGame();
 
@@ -44,8 +45,8 @@ const Scene = ({ gameOver, speed }) => {
           <group ref={ref}>
             <Blocks speed={speed} />
             <OverHangs />
-            <Ground size={[4, 0.5, 4]} position={[0, -0.5, 0]} layer={1} />
-            <Ground size={[5, 3.5, 5]} position={[0, -2.5, 0]} layer={2} />
+            <FoundationBlock size={[4, 0.5, 4]} position={[0, -0.5, 0]} layer={1} />
+            <FoundationBlock size={[5, 3.5, 5]} position={[0, -2.5, 0]} layer={2} />
           </group>
         </Physics>
       </Canvas>
@@ -53,13 +54,7 @@ const Scene = ({ gameOver, speed }) => {
   );
 };
 
-const useColor = (factor, hue, sat, light) => {
-  const stacks = useStackStore((state) => state.stacks);
-  const color = `hsl(${hue + stacks.length * factor},${sat}%, ${light}%)`;
-  return color;
-};
-
-const Ground = ({ position, size, layer }) => {
+const FoundationBlock = ({ position, size, layer }) => {
   const color = `hsl(${40 - layer * 12},50%, 90%)`;
   const [block1] = useBox(() => ({
     mass: 0,
@@ -73,6 +68,7 @@ const Ground = ({ position, size, layer }) => {
     </mesh>
   );
 };
+
 const OverHangs = () => {
   const overhangsArray = useStackStore((state) => state.overhangsArray);
 
