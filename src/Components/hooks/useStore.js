@@ -1,24 +1,16 @@
 import create from "zustand";
 import { v4 as uuidv4 } from "uuid";
-
-const INITIAL_BLOCK = {
-  position: { x: 0, y: 0, z: 0 },
-  size: { x: 3, y: 0.5, z: 3 },
-  color: `hsl(${40 + 1 * 2},50%, 50%)`,
-  direction: null,
-  key: uuidv4(),
-  stationary: true,
-  addPhysics: true,
-  mass: 0,
-};
+import { createBlockData } from "../CreateBlock";
 
 const useStackStore = create((set) => ({
   topLayer: null,
   prevLayer: null,
   move: false,
-  stacks: [{ ...INITIAL_BLOCK }],
+  stacks: [],
   overhangsArray: [],
   reposition: null,
+  hue: Math.floor(Math.random() * 360),
+  setHue: (newColor) => set((state) => ({ hue: newColor })),
   setReposition: (newReposition) => set((state) => ({ reposition: newReposition })),
   setBlockToCorrectLayer: (block) =>
     set((state) => ({
@@ -52,8 +44,14 @@ const useStackStore = create((set) => ({
   setMove: (boolean) => set(() => ({ move: boolean })),
   resetStore: () => {
     useStackStore.setState(savedState, true);
-    set(() => ({ stacks: [{ ...INITIAL_BLOCK, key: uuidv4() }] }));
+    set(() => ({ stacks: [] }));
+    set((state) => {
+      const newHue = Math.floor(Math.random() * 360);
+      state.setHue(newHue);
+      state.addBlock(createBlockData(state.stacks, newHue, 3, 3, 0, 0, true));
+    });
   },
+  addInitialBlock: (blockData) => set(() => ({ stacks: [blockData] })),
   addOverhangBlock: (newBlock) => set((state) => ({ overhangsArray: [...state.overhangsArray, newBlock] })),
 }));
 

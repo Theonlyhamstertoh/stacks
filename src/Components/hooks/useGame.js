@@ -14,11 +14,16 @@ const useGame = () => {
   const lvl = useLvl();
 
   const resetGame = () => {
-    setGameOver(false);
-    lvl.resetLvl();
     state.resetStore();
+    setGameOver(false);
+    // state.addBlock(createBlockData(state.stacks, state.hue, 3, 3, 0, 0, true));
   };
 
+  useEffect(() => {
+    const INITIAL = createBlockData(state.stacks, state.hue, 3, 3, 0, 0, true);
+    state.addBlock(INITIAL);
+  }, []);
+  useEffect(() => console.log(state.hue), [state.hue]);
   const destroyTower = () => {
     state.makeBlocksFall();
   };
@@ -48,12 +53,11 @@ const useGame = () => {
 
       // overhang block creation
       const nextBlockData = initializeNextBlockData(state.topLayer, overlap, state.updateBlock);
-      const nextBlock = createBlockData(state.stacks, ...nextBlockData);
+      const nextBlock = createBlockData(state.stacks, state.hue, ...nextBlockData);
 
       state.addBlock(nextBlock);
     } else if (overlap < 0) {
       setGameOver(true);
-      console.log(state.topLayer);
       state.updateBlock(null, state.topLayer.size, state.topLayer.mesh.position, false, true);
     }
   };

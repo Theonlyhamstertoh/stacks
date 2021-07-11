@@ -29,8 +29,8 @@ export const initializeNextBlockData = (topLayer, overlap, updateBlock) => {
   return [newWidth, newDepth, nextX, nextZ];
 };
 
-export const createBlockData = (stacks, newWidth, newDepth, nextX, nextZ) => {
-  const color = `hsl(${40 + stacks.length * 2},50%, 50%)`;
+export const createBlockData = (stacks, hue, newWidth, newDepth, nextX, nextZ, initial) => {
+  const color = `hsl(${hue + stacks.length * 2},50%, 55%)`;
   const position = { x: nextX, y: stacks.length / 2, z: nextZ };
   const direction = stacks.length % 2 ? "x" : "z";
   const size = { x: newWidth, y: 0.5, z: newDepth };
@@ -40,9 +40,9 @@ export const createBlockData = (stacks, newWidth, newDepth, nextX, nextZ) => {
     position,
     color,
     key: uuidv4(),
-    direction,
-    stationary: false,
-    addPhysics: false,
+    direction: initial ? null : direction,
+    stationary: initial ? true : false,
+    addPhysics: initial ? true : false,
     explode: false,
     size,
     overlap: null,
@@ -56,13 +56,8 @@ export const Block = ({ position, color, direction, addPhysics, size, id, statio
     mass: stationary ? 0 : 1,
     args: [size.x, size.y, size.z],
     position: [position.x, position.y, position.z],
-    // velocity: [0, 80, -20],
-    // angularVelocity: [10, 20, 30],
   }));
 
-  useEffect(() => {
-    explode && api.applyForce([500 * Math.random(), 1700, 500 * Math.random()], [5, 2, 5]);
-  }, []);
   const ref = useRef();
   useEffect(() => {
     const block = {
@@ -73,6 +68,7 @@ export const Block = ({ position, color, direction, addPhysics, size, id, statio
       color,
     };
     setBlockToCorrectLayer(block);
+    explode && api.applyForce([500 * Math.random(), 1700, 500 * Math.random()], [5, 2, 5]);
   }, []);
   const offset = 5;
   if (!addPhysics && direction !== null) {
