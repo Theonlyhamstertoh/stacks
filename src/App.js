@@ -9,23 +9,25 @@ import useGame from "./Components/hooks/useGame";
 import { Overhang } from "./Components/CreateOverhang";
 import useColor from "./Components/hooks/useColor";
 export default function App() {
-  const { handlePress, gameOver, resetGame, points, lvl, destroyTower, speed } = useGame();
-
+  const { handlePress, gameOver, resetGame, points, lvl, destroyTower, speed, start, setStart, destroyMode } = useGame();
   useEffect(() => {
-    document.body.onclick = (e) => handlePress(e);
-    document.body.onkeydown = (e) => handlePress(e);
+    start === true && (document.body.onclick = (e) => handlePress(e));
+    start === true && (document.body.onkeydown = (e) => handlePress(e));
   });
   return (
     <>
-      <div className="gameContainer">
-        <div className="scoreBox">
-          <div className="points">{lvl.score}</div>
-          <div className="lvl">Level {lvl.lvl}</div>
-          <div className="speed">Speed: {speed - 4}x</div>
+      {start && (
+        <div className="gameContainer">
+          <div className="scoreBox">
+            <div className="points">{lvl.score}</div>
+            <div className="lvl">Level {lvl.lvl}</div>
+            <div className="speed">Speed: {speed - 4}x</div>
+          </div>
+          {gameOver && <input type="button" value="Play Again" className="gameButton" onClick={resetGame} />}
+          {gameOver && <input type="button" value="Destroy Tower" className="gameButton" onClick={destroyTower} disabled={destroyMode} />}
         </div>
-        {gameOver && <input type="button" value="play again" className="gameButton" onClick={resetGame} />}
-        {gameOver && <input type="button" value="Destroy Tower" className="gameButton" onClick={destroyTower} />}
-      </div>
+      )}
+      {!start && <input type="button" value="Start Game" className="gameButton start" onClick={() => setStart(true)} />}
       <Scene gameOver={gameOver} speed={speed} />
     </>
   );

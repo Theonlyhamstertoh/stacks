@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { useBox } from "@react-three/cannon";
 import { useEffect } from "react";
+import { playAudio } from "./hooks/useGame";
 
 export const createOverhangBlock = ({ snapShotPosition, offset, overlap, topLayer, addOverhangBlock, delta }) => {
   const overhangShift = (overlap / 2) * Math.sign(delta);
@@ -33,6 +34,7 @@ export const Overhang = ({ color, position, size, explode }) => {
       friction: 0.2,
       restitution: 0.7,
     },
+    onCollide: (e) => playAudio(e),
   }));
   useEffect(() => {
     explode && api.applyForce([500 * Math.random(), 800, 500 * Math.random()], [0, 1, 0]);

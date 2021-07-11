@@ -10,12 +10,16 @@ const brickDrop = new Audio(brickDropAudio);
 
 const useGame = () => {
   const [gameOver, setGameOver] = useState(false);
+  const [start, setStart] = useState(false);
+  const [destroyMode, setDestroyMode] = useState(false);
   const state = useStackStore();
   const lvl = useLvl();
 
   const resetGame = () => {
     state.resetStore();
     setGameOver(false);
+    lvl.resetLvl();
+    setDestroyMode(false);
     // state.addBlock(createBlockData(state.stacks, state.hue, 3, 3, 0, 0, true));
   };
 
@@ -26,6 +30,8 @@ const useGame = () => {
   useEffect(() => console.log(state.hue), [state.hue]);
   const destroyTower = () => {
     state.makeBlocksFall();
+    setDestroyMode(true);
+    console.log("asfklj");
   };
 
   const playNextLayer = () => {
@@ -68,12 +74,20 @@ const useGame = () => {
     (e.code === "Space" || e.code === undefined) && state.setMove(false);
     (e.code === "Space" || e.code === undefined) && playNextLayer();
   };
-  return { gameOver, resetGame, handlePress, lvl, destroyTower, speed: lvl.speed };
+  return { gameOver, resetGame, handlePress, lvl, destroyTower, speed: lvl.speed, start, setStart, destroyMode };
 };
 
-export const playAudio = () => {
-  brickDrop.currentTime = 0;
-  brickDrop.play();
+export const playAudio = (e) => {
+  if (e !== undefined && e.contact.impactVelocity > 7) {
+    brickDrop.currentTime = 0;
+    console.log(e.contact.impactVelocity);
+    brickDrop.volume = e.contact.impactVelocity / 80;
+    brickDrop.play();
+  } else if (e === undefined) {
+    brickDrop.volume = 1;
+    brickDrop.currentTime = 0;
+    brickDrop.play();
+  }
 };
 
 export default useGame;
