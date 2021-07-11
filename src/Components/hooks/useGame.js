@@ -21,15 +21,15 @@ const useGame = () => {
     // state.addBlock(createBlockData(state.stacks, state.hue, 3, 3, 0, 0, true));
   };
 
+  useEffect(() => gameOver && state.updateBlock(null, state.topLayer.size, state.topLayer.mesh.position, false, true), [gameOver]);
   useEffect(() => {
     const INITIAL = createBlockData(state.stacks, state.hue, 3, 3, 0, 0, true);
     state.addBlock(INITIAL);
   }, []);
-  useEffect(() => console.log(state.hue), [state.hue]);
+
   const destroyTower = () => {
     state.makeBlocksFall();
     setDestroyMode(true);
-    console.log("asfklj");
   };
 
   const playNextLayer = () => {
@@ -63,7 +63,6 @@ const useGame = () => {
       state.addBlock(nextBlock);
     } else if (overlap < 0) {
       setGameOver(true);
-      state.updateBlock(null, state.topLayer.size, state.topLayer.mesh.position, false, true);
     }
   };
 
@@ -72,7 +71,7 @@ const useGame = () => {
     if (gameOver === true) return;
     (e.code === "Space" || e.code === undefined) && playNextLayer();
   };
-  return { gameOver, resetGame, handlePress, lvl, destroyTower, speed: lvl.speed, start, setStart, destroyMode, playNextLayer };
+  return { gameOver, resetGame, handlePress, lvl, destroyTower, speed: lvl.speed, start, setStart, destroyMode, playNextLayer, setGameOver };
 };
 
 export default useGame;
