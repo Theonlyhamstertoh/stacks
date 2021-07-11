@@ -9,7 +9,7 @@ import useGame from "./Components/hooks/useGame";
 import { Overhang } from "./Components/CreateOverhang";
 import useColor from "./Components/hooks/useColor";
 export default function App() {
-  const { handlePress, gameOver, resetGame, points, lvl, destroyTower, speed, start, setStart, destroyMode } = useGame();
+  const { handlePress, gameOver, resetGame, points, lvl, destroyTower, speed, start, setStart, destroyMode, playNextLayer } = useGame();
   useEffect(() => {
     start === true && (document.body.onclick = (e) => handlePress(e));
     start === true && (document.body.onkeydown = (e) => handlePress(e));
@@ -27,7 +27,17 @@ export default function App() {
           {gameOver && <input type="button" value="Destroy Tower" className="gameButton" onClick={destroyTower} disabled={destroyMode} />}
         </div>
       )}
-      {!start && <input type="button" value="Start Game" className="gameButton start" onClick={() => setStart(true)} />}
+      {!start && (
+        <input
+          type="button"
+          value="Start Game"
+          className="gameButton start"
+          onClick={(e) => {
+            setStart(true);
+            playNextLayer();
+          }}
+        />
+      )}
       <Scene gameOver={gameOver} speed={speed} />
     </>
   );
