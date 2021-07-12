@@ -1,7 +1,5 @@
 # Stacks
 
-# Stacks
-
 ## Links
 > ### [Live Link](https://stacks-iota.vercel.app/)
 
