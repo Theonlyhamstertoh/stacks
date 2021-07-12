@@ -1,19 +1,18 @@
 import * as THREE from "three";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Physics, useBox } from "@react-three/cannon";
+import { Canvas } from "@react-three/fiber";
+import { Physics } from "@react-three/cannon";
 import Camera from "./Components/Camera";
-import { useEffect, useRef } from "react";
-import { Block } from "./Components/CreateBlock";
-import useStackStore from "./Components/hooks/useStore";
+import { useEffect, useRef, useState } from "react";
 import useGame from "./Components/hooks/useGame";
-import { Overhang } from "./Components/CreateOverhang";
 import useColor from "./Components/hooks/useColor";
 import Blocks from "./Components/Blocks";
 import FoundationBlock from "./Components/FoundationBlocks";
 import OverHangs from "./Components/Overhangs";
+import db from "./index";
 
 export default function App() {
   const GAME = useGame();
+
   useEffect(() => {
     GAME.start === true && (document.body.onclick = (e) => GAME.handlePress(e));
     GAME.start === true && (document.body.onkeydown = (e) => GAME.handlePress(e));
@@ -41,6 +40,7 @@ const GameUI = ({ gameOver, speed, lvl, destroyTower, destroyMode, resetGame, st
               <div className="normalSize speed">Speed: {speed - 4}x</div>
             </div>
             {gameOver && <input type="button" value="Play Again" className="gameButton" onClick={resetGame} />}
+
             {gameOver && <input type="button" value="Destroy Tower" className="gameButton" onClick={destroyTower} disabled={destroyMode} />}
           </>
         )}
