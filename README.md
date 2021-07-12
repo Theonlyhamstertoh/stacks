@@ -19,7 +19,7 @@
 - [React Three Drei](https://github.com/pmndrs/drei) 
 - [useCannon](https://github.com/pmndrs/use-cannon) 
 - [Three](https://threejs.org//) 
-- [Zustand]
+- [Zustand](https://github.com/pmndrs/zustand)
 - [Learn Three.js while building a 3D game with physics](https://www.youtube.com/watch?v=hBiGFpBle7E&t=1929s) - Thanks to this video for giving me the idea to make this in React Three Fiber and try to create it on my own. When I had difficulty, this was a great little tip helper!
 
 
