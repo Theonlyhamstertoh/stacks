@@ -7,13 +7,13 @@
 
 ## Images 
 **Start Screen**
-![image](public/images/screenshots/start.png)
+![image](public/screenshots/start.png)
 **Playing Screen**
-![image](public/images/screenshots/playing.png)
+![image](public/screenshots/playing.png)
 **Game Over Screen**
-![image](public/images/screenshots/gameover.png)
-**Destroy Screen **
-![image](public/images/screenshots/destroy.png)
+![image](public/screenshots/gameover.png)
+**Destroy Screen**
+![image](public/screenshots/destroy.png)
 
 
 ## Attributes
